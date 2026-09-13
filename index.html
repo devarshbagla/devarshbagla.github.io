@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/layout.css">
   <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/sections.css">
 
   <!-- Prevent flash of wrong theme before CSS/JS hydrate -->
   <script>
@@ -81,6 +82,7 @@
   </script>
 </head>
 <body>
+  <progress class="scroll-progress" data-scroll-progress max="100" value="0" aria-hidden="true"></progress>
   <a class="skip-link" href="#main">Skip to content</a>
 
   <div class="site">
@@ -131,8 +133,129 @@
     </header>
 
     <main id="main">
-      <section id="hero" aria-label="Hero"></section>
-      <section id="about" aria-label="About"></section>
+      <section id="hero" class="hero" aria-label="Hero">
+        <div class="container hero__grid">
+          <div class="hero__content" data-reveal>
+            <p class="hero__eyebrow">Devarsh Bagla / Waltham, MA</p>
+            <h1 class="hero__title">I build small tools for problems that annoy me.</h1>
+            <p class="hero__lead">
+              Computer Science and Economics at Brandeis, Class of 2030. A Chrome
+              extension because I leave forty tabs open instead of setting reminders. A
+              voice assistant for my laptop because Cortana died and nothing replaced it.
+              An app that makes my laptop vibrate through its speakers, because laptops
+              have no haptic motor.
+            </p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="#projects">See what I've built</a>
+              <a
+                class="btn btn--ghost"
+                href="https://dx.doi.org/10.70729/SE251005174007"
+                target="_blank"
+                rel="noopener noreferrer"
+              >Read the paper</a>
+            </div>
+            <div class="hero__stats" aria-label="Highlights">
+              <div class="hero__stat">
+                <span class="hero__stat-value">64,374</span>
+                <span class="hero__stat-label">Records benchmarked</span>
+              </div>
+              <div class="hero__stat">
+                <span class="hero__stat-value">15</span>
+                <span class="hero__stat-label">Students mentored</span>
+              </div>
+              <div class="hero__stat">
+                <span class="hero__stat-value">290%</span>
+                <span class="hero__stat-label">Of fundraising target</span>
+              </div>
+              <div class="hero__stat">
+                <span class="hero__stat-value">30+</span>
+                <span class="hero__stat-label">Events run</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero__scope" data-scope data-reveal>
+            <canvas
+              class="hero__scope-canvas"
+              data-scope-canvas
+              role="img"
+              aria-label="Animated oscilloscope waveform representing DeskPulse speaker vibration"
+            ></canvas>
+            <p class="hero__scope-readout" data-scope-readout aria-hidden="true">
+              FREQ 2.40 Hz&nbsp;&nbsp;AMP 0.62&nbsp;&nbsp;PHASE 1.73 rad
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="section about" aria-labelledby="about-heading">
+        <div class="container">
+          <p class="section__label" id="about-heading" data-reveal>01 / About</p>
+          <div class="about__grid">
+            <div class="about__prose" data-reveal>
+              <p>
+                Most of what I build is unfinished. The one that isn't is bees.in, a website
+                I designed and shipped end to end for a wealth management firm in Kolkata that
+                had spent twenty-five years on word of mouth and had nothing online. Two
+                months, shipped feature by feature rather than as one launch.
+              </p>
+              <p>
+                I also published a
+                <a href="https://dx.doi.org/10.70729/SE251005174007" target="_blank" rel="noopener noreferrer">sole-authored study</a>
+                benchmarking logistic regression, random forests and a deep neural network for
+                customer churn prediction across 64,374 records. The neural network reached
+                94.1% accuracy against an 83.6% linear baseline.
+              </p>
+              <p>
+                The part I care about more than either is teaching. I mentored fifteen
+                students for a full academic year at my school's computer club, ran it open
+                to everyone rather than CS students only, and let people build whatever they
+                wanted instead of teaching a syllabus. What I took from it is that people
+                stay when they're building their own idea, and leave the moment it becomes a
+                lecture.
+              </p>
+              <p>
+                Right now I'm running local language models on integrated graphics because I
+                don't own a discrete GPU, and learning CAD so I can design the parts I print
+                instead of downloading them.
+              </p>
+            </div>
+
+            <aside class="about__aside" data-reveal>
+              <dl class="about__dl">
+                <div>
+                  <dt>Location</dt>
+                  <dd>Waltham, MA / Kolkata, India</dd>
+                </div>
+                <div>
+                  <dt>Studying</dt>
+                  <dd>B.S. Computer Science, B.S. Economics</dd>
+                </div>
+                <div>
+                  <dt>Minor</dt>
+                  <dd>Finance</dd>
+                </div>
+                <div>
+                  <dt>Languages</dt>
+                  <dd>English, Hindi, Bengali, French</dd>
+                </div>
+                <div>
+                  <dt>Currently</dt>
+                  <dd>Learning CAD, running local inference</dd>
+                </div>
+                <div>
+                  <dt>Elsewhere</dt>
+                  <dd>
+                    <a href="https://github.com/devarshbagla" rel="noopener noreferrer">GitHub</a>
+                    <a href="https://www.linkedin.com/in/devarshbagla" rel="noopener noreferrer">LinkedIn</a>
+                  </dd>
+                </div>
+              </dl>
+            </aside>
+          </div>
+        </div>
+      </section>
+
       <section id="work" aria-label="Work"></section>
       <section id="projects" aria-label="Projects"></section>
       <section id="research" aria-label="Research"></section>

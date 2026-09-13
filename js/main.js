@@ -1,4 +1,6 @@
 import { initTheme } from "./theme.js";
+import { initScope } from "./scope.js";
+import { initReveal, initScrollProgress } from "./reveal.js";
 
 function initHeaderScroll() {
   const header = document.querySelector("[data-site-header]");
@@ -25,7 +27,6 @@ function initMobileNav() {
   const getFocusable = () =>
     Array.from(nav.querySelectorAll(focusableSelector)).filter((el) => {
       if (el.hasAttribute("disabled")) return false;
-      // offsetParent is null for position:fixed — use client rects instead
       return el.getClientRects().length > 0;
     });
 
@@ -100,7 +101,6 @@ function initMobileNav() {
     }
   });
 
-  // Close overlay if viewport grows past the mobile breakpoint
   const mq = window.matchMedia("(min-width: 769px)");
   const onBreakpoint = (e) => {
     if (e.matches && isOpen()) close();
@@ -115,3 +115,6 @@ function initMobileNav() {
 initTheme();
 initHeaderScroll();
 initMobileNav();
+initScope();
+initReveal();
+initScrollProgress();
