@@ -169,15 +169,16 @@ body.nav-open .nav-toggle__bar:nth-child(3) {
     inset: 0;
     z-index: 90;
     display: flex;
-    align-items: stretch;
-    justify-content: stretch;
-    padding: calc(var(--header-h) + var(--space-6)) var(--gutter) var(--space-8);
+    flex-direction: column;
+    justify-content: center;
+    padding: calc(var(--header-h) + var(--space-8)) var(--gutter) var(--space-8);
     background: color-mix(in srgb, var(--bg) 96%, transparent);
     backdrop-filter: blur(16px) saturate(1.15);
     -webkit-backdrop-filter: blur(16px) saturate(1.15);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+    overflow-y: auto;
     transition:
       opacity 220ms var(--ease-out),
       visibility 220ms var(--ease-out);
@@ -193,8 +194,9 @@ body.nav-open .nav-toggle__bar:nth-child(3) {
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    gap: var(--space-2);
+    gap: var(--space-3);
     width: 100%;
+    margin-block: auto;
   }
 
   .site-nav__link {
