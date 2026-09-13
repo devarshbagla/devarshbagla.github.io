@@ -1,139 +1,513 @@
-
-cached 4m 43s left
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Index · HTML
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Devarsh Bagla</title>
-<style>
-  :root { --ink:#16150f; --mut:#5d5a4e; --line:#ddd8c8; --bg:#faf8f2; --acc:#7a2e1e; }
-  * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--ink);
-         font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-         -webkit-font-smoothing:antialiased; }
-  .wrap { max-width:660px; margin:0 auto; padding:72px 24px 96px; }
-  h1 { font-size:34px; line-height:1.1; margin:0 0 6px; letter-spacing:-0.5px; }
-  .sub { color:var(--mut); margin:0 0 22px; }
-  .links a { color:var(--acc); text-decoration:none; border-bottom:1px solid var(--line); }
-  .links a:hover { border-color:var(--acc); }
-  .links { margin:0 0 40px; }
-  h2 { font-size:12px; text-transform:uppercase; letter-spacing:1.4px; color:var(--mut);
-       border-bottom:1px solid var(--line); padding-bottom:6px; margin:40px 0 16px; font-weight:700; }
-  .item { margin:0 0 20px; }
-  .item b { display:block; }
-  .item p { margin:2px 0 0; color:var(--mut); }
-  p.lead { margin:0 0 16px; }
-  footer { margin-top:56px; color:var(--mut); font-size:14px; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devarsh Bagla — builds things</title>
+  <meta name="description" content="Computer Science and Economics at Brandeis. I build small tools for problems that annoy me, and teach other people to do the same.">
+  <meta name="author" content="Devarsh Bagla">
+  <meta name="theme-color" content="#0B0A09" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F7F3EC" media="(prefers-color-scheme: light)">
+  <link rel="canonical" href="https://devarshbagla.github.io/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://devarshbagla.github.io/">
+  <meta property="og:title" content="Devarsh Bagla — builds things">
+  <meta property="og:description" content="Computer Science and Economics at Brandeis. I build small tools for problems that annoy me, and teach other people to do the same.">
+  <meta property="og:site_name" content="Devarsh Bagla">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Devarsh Bagla — builds things">
+  <meta name="twitter:description" content="Computer Science and Economics at Brandeis. I build small tools for problems that annoy me, and teach other people to do the same.">
+
+  <!-- Fonts: preconnect + preload, then stylesheet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap">
+
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/sections.css">
+
+  <!-- Prevent flash of wrong theme before CSS/JS hydrate -->
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem("theme");
+        var theme = (stored === "light" || stored === "dark")
+          ? stored
+          : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
+        var meta = document.querySelector('meta[name="theme-color"]:not([media])');
+        if (!meta) {
+          meta = document.createElement("meta");
+          meta.setAttribute("name", "theme-color");
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute("content", theme === "light" ? "#F7F3EC" : "#0B0A09");
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Devarsh Bagla",
+    "url": "https://devarshbagla.github.io",
+    "email": "mailto:devarshbagla@gmail.com",
+    "affiliation": {
+      "@type": "CollegeOrUniversity",
+      "name": "Brandeis University"
+    },
+    "knowsAbout": [
+      "machine learning",
+      "web development",
+      "embedded systems",
+      "3D printing"
+    ],
+    "sameAs": [
+      "https://github.com/devarshbagla",
+      "https://www.linkedin.com/in/devarshbagla"
+    ]
+  }
+  </script>
 </head>
 <body>
-<div class="wrap">
- 
-  <h1>Devarsh Bagla</h1>
-  <p class="sub">Computer Science and Economics, Brandeis University, Class of 2030. Kolkata and Jaipur, now Waltham.</p>
-  <p class="links">
-    <a href="mailto:devarshbagla@brandeis.edu">email</a> ·
-    <a href="https://www.linkedin.com/in/devarshbagla/">linkedin</a> ·
-    <a href="https://github.com/devarshbagla">github</a> ·
-    <a href="https://linktr.ee/devarshbagla">links</a>
-  </p>
- 
-  <p class="lead">I build small tools for problems that annoy me, and I like teaching other people to do the
-  same. Most of what follows is unfinished. This site is new and will get better.</p>
- 
-  <h2>Building</h2>
- 
-  <div class="item">
-    <b>SnapBack</b>
-    <p>I don't set reminders, I leave tabs open. RAM is expensive. A Chrome extension that puts tab groups
-    away and brings them back on a geolocation, time or condition trigger.</p>
+  <progress class="scroll-progress" data-scroll-progress max="100" value="0" aria-hidden="true"></progress>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="site">
+    <header class="site-header" data-site-header>
+      <div class="container site-header__inner">
+        <a class="site-logo" href="/">Devarsh Bagla</a>
+
+        <div class="site-header__actions">
+          <nav class="site-nav" data-site-nav aria-label="Primary">
+            <ul class="site-nav__list" id="primary-nav-list">
+              <li><a class="site-nav__link" href="#work">Work</a></li>
+              <li><a class="site-nav__link" href="#projects">Projects</a></li>
+              <li><a class="site-nav__link" href="#research">Research</a></li>
+              <li><a class="site-nav__link" href="#teaching">Teaching</a></li>
+              <li><a class="site-nav__link" href="#contact">Contact</a></li>
+            </ul>
+          </nav>
+
+          <button
+            type="button"
+            class="icon-btn theme-toggle"
+            data-theme-toggle
+            aria-label="Switch to light theme"
+          >
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/>
+            </svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="icon-btn nav-toggle"
+            data-nav-toggle
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="primary-nav-list"
+          >
+            <span class="nav-toggle__bar" aria-hidden="true"></span>
+            <span class="nav-toggle__bar" aria-hidden="true"></span>
+            <span class="nav-toggle__bar" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <section id="hero" class="hero" aria-label="Hero">
+        <div class="container hero__grid">
+          <div class="hero__content" data-reveal>
+            <p class="hero__eyebrow">Devarsh Bagla / Waltham, MA</p>
+            <h1 class="hero__title">I build small tools for problems that annoy me.</h1>
+            <p class="hero__lead">
+              Computer Science and Economics at Brandeis, Class of 2030. A Chrome
+              extension because I leave forty tabs open instead of setting reminders. A
+              voice assistant for my laptop because Cortana died and nothing replaced it.
+              An app that makes my laptop vibrate through its speakers, because laptops
+              have no haptic motor.
+            </p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="#projects">See what I've built</a>
+              <a
+                class="btn btn--ghost"
+                href="https://dx.doi.org/10.70729/SE251005174007"
+                target="_blank"
+                rel="noopener noreferrer"
+              >Read the paper</a>
+            </div>
+            <div class="hero__stats" aria-label="Highlights">
+              <div class="hero__stat">
+                <span class="hero__stat-value">64,374</span>
+                <span class="hero__stat-label">Records benchmarked</span>
+              </div>
+              <div class="hero__stat">
+                <span class="hero__stat-value">15</span>
+                <span class="hero__stat-label">Students mentored</span>
+              </div>
+              <div class="hero__stat">
+                <span class="hero__stat-value">290%</span>
+                <span class="hero__stat-label">Of fundraising target</span>
+              </div>
+              <div class="hero__stat">
+                <span class="hero__stat-value">30+</span>
+                <span class="hero__stat-label">Events run</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero__scope" data-scope data-reveal>
+            <canvas
+              class="hero__scope-canvas"
+              data-scope-canvas
+              role="img"
+              aria-label="Animated oscilloscope waveform representing DeskPulse speaker vibration"
+            ></canvas>
+            <p class="hero__scope-readout" data-scope-readout aria-hidden="true">
+              FREQ 2.40 Hz&nbsp;&nbsp;AMP 0.62&nbsp;&nbsp;PHASE 1.73 rad
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="section about" aria-labelledby="about-heading">
+        <div class="container">
+          <p class="section__label" id="about-heading" data-reveal>01 / About</p>
+          <div class="about__grid">
+            <div class="about__prose" data-reveal>
+              <p>
+                Most of what I build is unfinished. The one that isn't is bees.in, a website
+                I designed and shipped end to end for a wealth management firm in Kolkata that
+                had spent twenty-five years on word of mouth and had nothing online. Two
+                months, shipped feature by feature rather than as one launch.
+              </p>
+              <p>
+                I also published a
+                <a href="https://dx.doi.org/10.70729/SE251005174007" target="_blank" rel="noopener noreferrer">sole-authored study</a>
+                benchmarking logistic regression, random forests and a deep neural network for
+                customer churn prediction across 64,374 records. The neural network reached
+                94.1% accuracy against an 83.6% linear baseline.
+              </p>
+              <p>
+                The part I care about more than either is teaching. I mentored fifteen
+                students for a full academic year at my school's computer club, ran it open
+                to everyone rather than CS students only, and let people build whatever they
+                wanted instead of teaching a syllabus. What I took from it is that people
+                stay when they're building their own idea, and leave the moment it becomes a
+                lecture.
+              </p>
+              <p>
+                Right now I'm running local language models on integrated graphics because I
+                don't own a discrete GPU, and learning CAD so I can design the parts I print
+                instead of downloading them.
+              </p>
+            </div>
+
+            <aside class="about__aside" data-reveal>
+              <dl class="about__dl">
+                <div>
+                  <dt>Location</dt>
+                  <dd>Waltham, MA / Kolkata, India</dd>
+                </div>
+                <div>
+                  <dt>Studying</dt>
+                  <dd>B.S. Computer Science, B.S. Economics</dd>
+                </div>
+                <div>
+                  <dt>Minor</dt>
+                  <dd>Finance</dd>
+                </div>
+                <div>
+                  <dt>Languages</dt>
+                  <dd>English, Hindi, Bengali, French</dd>
+                </div>
+                <div>
+                  <dt>Currently</dt>
+                  <dd>Learning CAD, running local inference</dd>
+                </div>
+                <div>
+                  <dt>Elsewhere</dt>
+                  <dd>
+                    <a href="https://github.com/devarshbagla" rel="noopener noreferrer">GitHub</a>
+                    <a href="https://www.linkedin.com/in/devarshbagla" rel="noopener noreferrer">LinkedIn</a>
+                  </dd>
+                </div>
+              </dl>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="work" class="section work" aria-labelledby="work-heading">
+        <div class="container">
+          <p class="section__label" id="work-heading" data-reveal>02 / WORK</p>
+          <div class="work__list">
+            <article class="work-card" data-reveal tabindex="0" data-work-card>
+              <div class="work-card__header">
+                <h3 class="work-card__role">Web Developer, freelance</h3>
+                <p class="work-card__org">BEES Network Ltd, Kolkata</p>
+                <p class="work-card__meta">2 MONTHS · SOLE DEVELOPER · LIVE IN PRODUCTION</p>
+              </div>
+              <p class="work-card__body">
+                Built and shipped the company's first website end to end: information
+                architecture, layout, copy, build, deployment and DNS. A financial planning
+                firm that had operated for twenty-five years entirely on in-person referrals
+                with no web presence. Delivered iteratively, shipping features one at a time
+                rather than as a single launch. Plain HTML and CSS, no framework, built with
+                an AI-assisted workflow.
+              </p>
+              <a
+                class="work-card__link"
+                href="https://bees.in"
+                target="_blank"
+                rel="noopener noreferrer"
+              >bees.in</a>
+            </article>
+
+            <article class="work-card" data-reveal tabindex="0" data-work-card>
+              <div class="work-card__header">
+                <h3 class="work-card__role">Private Tutor, Computer Science</h3>
+                <p class="work-card__org">Independent, Jaipur</p>
+                <p class="work-card__meta">3 MONTHS · IGCSE · 1 STUDENT</p>
+              </div>
+              <p class="work-card__body">
+                Taught IGCSE Computer Science, focused on pseudocode and algorithmic
+                problem solving. Took a student from no prior programming exposure to
+                independently solving IGCSE pseudocode problems.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="projects" class="section projects" aria-labelledby="projects-heading">
+        <div class="container">
+          <p class="section__label" id="projects-heading" data-reveal>03 / PROJECTS</p>
+          <div class="projects__grid">
+
+            <article class="project-card" data-reveal tabindex="0" data-project-card>
+              <div class="project-card__top">
+                <h3 class="project-card__title">DeskPulse</h3>
+                <span class="status status--prototype">PROTOTYPE</span>
+              </div>
+              <ul class="project-card__tags" aria-label="Tags">
+                <li>Web Audio</li>
+                <li>DSP</li>
+                <li>Accessibility</li>
+              </ul>
+              <p class="project-card__body">
+                Laptops have no vibration motor, so a notification is either audible or
+                invisible. DeskPulse fires short bass-heavy bursts below hearing range
+                through the speakers, driving the voice coil hard enough that the chassis
+                itself vibrates. It auto-triggers on notifications, calls, new email and
+                errors. Usable in a silent library, and by anyone who cannot rely on audio
+                cues.
+              </p>
+              <div class="deskpulse" data-deskpulse>
+                <div class="deskpulse__controls">
+                  <button type="button" class="btn btn--primary deskpulse__play" data-deskpulse-play>
+                    <svg class="deskpulse__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M3 12h2l2-6 3 12 2-8 2 4h7"/>
+                    </svg>
+                    Feel it
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-btn deskpulse__mute"
+                    data-deskpulse-mute
+                    aria-pressed="false"
+                    aria-label="Mute DeskPulse demo"
+                    title="Mute"
+                  >
+                    <svg class="deskpulse__mute-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M11 5 6 9H3v6h3l5 4V5z"/>
+                      <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
+                      <path d="M18 6a8 8 0 0 1 0 12"/>
+                    </svg>
+                    <svg class="deskpulse__mute-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden>
+                      <path d="M11 5 6 9H3v6h3l5 4V5z"/>
+                      <path d="M22 9l-6 6M16 9l6 6"/>
+                    </svg>
+                  </button>
+                </div>
+                <canvas class="deskpulse__canvas" data-deskpulse-canvas width="320" height="48" aria-hidden="true"></canvas>
+                <p class="deskpulse__note" data-deskpulse-note>
+                  Best on a laptop with the volume up. You should feel it more than hear it.
+                </p>
+              </div>
+            </article>
+
+            <article class="project-card" data-reveal tabindex="0" data-project-card>
+              <div class="project-card__top">
+                <h3 class="project-card__title">LIZI</h3>
+                <span class="status status--dev">IN DEVELOPMENT</span>
+              </div>
+              <ul class="project-card__tags" aria-label="Tags">
+                <li>Voice UI</li>
+                <li>Local LLM</li>
+                <li>Windows</li>
+              </ul>
+              <p class="project-card__body">
+                A voice assistant for my laptop. Recognises my voice, changes system
+                settings, sends email, and routes anything complicated to language models
+                running locally on my own machine rather than a cloud API. Built because I
+                was used to Gemini on a tablet and Siri on a phone, and it always bothered
+                me that my laptop could not do the same after Cortana was discontinued.
+              </p>
+            </article>
+
+            <article class="project-card" data-reveal tabindex="0" data-project-card>
+              <div class="project-card__top">
+                <h3 class="project-card__title">SnapBack</h3>
+                <span class="status status--dev">IN DEVELOPMENT</span>
+              </div>
+              <ul class="project-card__tags" aria-label="Tags">
+                <li>Chrome Extension</li>
+                <li>Context Triggers</li>
+              </ul>
+              <p class="project-card__body">
+                I don't set reminders, I leave tabs open and come back to them. RAM is
+                expensive and my laptop can only take so much. SnapBack snoozes entire tab
+                groups and brings them back on a trigger: arriving at a location, a calendar
+                event starting, or a date being reached.
+              </p>
+            </article>
+
+            <article class="project-card" data-reveal tabindex="0" data-project-card>
+              <div class="project-card__top">
+                <h3 class="project-card__title">Desktop Task Manager</h3>
+                <span class="status status--dev">IN DEVELOPMENT</span>
+              </div>
+              <ul class="project-card__tags" aria-label="Tags">
+                <li>Windows Shell</li>
+                <li>WorkerW</li>
+                <li>C#</li>
+              </ul>
+              <p class="project-card__body">
+                A task list drawn directly into the Windows desktop layer, behind the icons,
+                using WorkerW. That is undocumented Windows shell behaviour, which is most of
+                why I wanted to build it. Includes a live countdown strip in the taskbar.
+              </p>
+            </article>
+
+            <article class="project-card" data-reveal tabindex="0" data-project-card>
+              <div class="project-card__top">
+                <h3 class="project-card__title">Agentic Workflow</h3>
+                <span class="status status--shipped">SHIPPED</span>
+              </div>
+              <ul class="project-card__tags" aria-label="Tags">
+                <li>Methodology</li>
+                <li>Cursor</li>
+                <li>Context Design</li>
+              </ul>
+              <p class="project-card__body">
+                Not software, a method. Every project I run carries three files: one
+                recording where the work actually stands, one telling an agent how this
+                specific project is structured and what not to touch, and a scoped rules
+                file. A session that dies at 2am gets picked up cold the next morning without
+                re-explaining the codebase. I built it because my problem was never writing
+                code, it was abandoning things at sixty percent, and the cost was all in
+                rebuilding context.
+              </p>
+            </article>
+
+            <article class="project-card" data-reveal tabindex="0" data-project-card>
+              <div class="project-card__top">
+                <h3 class="project-card__title">Chess Coach</h3>
+                <span class="status status--dev">IN DEVELOPMENT</span>
+              </div>
+              <ul class="project-card__tags" aria-label="Tags">
+                <li>IndexedDB</li>
+                <li>Web Workers</li>
+              </ul>
+              <p class="project-card__body">
+                A browser chess coach that plays you, reviews your moves and tracks
+                improvement. Rebuilt the storage layer so games survive a refresh, and moved
+                the engine's move search onto a background thread so the board stopped
+                freezing while it calculated.
+              </p>
+            </article>
+
+            <article class="project-card" data-reveal tabindex="0" data-project-card>
+              <div class="project-card__top">
+                <h3 class="project-card__title">From Dust to Zenith</h3>
+                <span class="status status--shipped">SHIPPED</span>
+              </div>
+              <ul class="project-card__tags" aria-label="Tags">
+                <li>Vercel</li>
+                <li>DNS</li>
+              </ul>
+              <p class="project-card__body">
+                An editorial publication site, built and deployed on Vercel with DNS
+                configured through GoDaddy, followed by a full UI audit and fixes.
+              </p>
+              <a
+                class="project-card__link"
+                href="https://fromdusttozenith.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-project-link
+              >fromdusttozenith.in</a>
+            </article>
+
+            <article class="project-card" data-reveal tabindex="0" data-project-card>
+              <div class="project-card__top">
+                <h3 class="project-card__title">Casio fx-CG50 Replica</h3>
+                <span class="status status--prototype">PROTOTYPE</span>
+              </div>
+              <ul class="project-card__tags" aria-label="Tags">
+                <li>Spec to App</li>
+              </ul>
+              <p class="project-card__body">
+                A working replica of a graphing calculator, rebuilt from its specification.
+              </p>
+            </article>
+
+          </div>
+        </div>
+      </section>
+      <section id="research" aria-label="Research"></section>
+      <section id="teaching" aria-label="Teaching"></section>
+      <section id="workbench" aria-label="Workbench"></section>
+      <section id="contact" aria-label="Contact"></section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="site-footer__row">
+          <p>Devarsh Bagla, Waltham MA</p>
+          <nav class="site-footer__links" aria-label="Contact links">
+            <a href="mailto:devarshbagla@gmail.com">email</a>
+            <a href="https://github.com/devarshbagla" rel="noopener noreferrer">github</a>
+            <a href="https://www.linkedin.com/in/devarshbagla" rel="noopener noreferrer">linkedin</a>
+          </nav>
+        </div>
+        <p class="site-footer__note">
+          Built without a framework.
+          <a href="https://github.com/devarshbagla/devarshbagla.github.io" rel="noopener noreferrer">View source.</a>
+        </p>
+      </div>
+    </footer>
   </div>
- 
-  <div class="item">
-    <b>LIZI</b>
-    <p>A laptop voice assistant. Recognises my voice, changes system settings, sends email, and routes the
-    harder questions to models running locally on my machine. Built because Cortana died and nothing replaced it.</p>
-  </div>
- 
-  <div class="item">
-    <b>DeskPulse</b>
-    <p>Why don't laptops have haptic motors? Short bass-heavy bursts below hearing range through the speakers,
-    so the chassis vibrates. Fires on notifications, calls, new email and errors.</p>
-  </div>
- 
-  <div class="item">
-    <b><a href="https://bees.in" style="color:var(--acc);text-decoration:none;">bees.in</a></b>
-    <p>First website for BEES Network, a Kolkata wealth management firm that had run for twenty-five years on
-    in-person referrals alone. Architecture, layout, copy and deployment.</p>
-  </div>
- 
-  <h2>Research</h2>
-  <div class="item">
-    <b>Deep Learning Approaches for Churn Prediction</b>
-    <p>Sole author. International Journal of Scientific Engineering and Research, 13(10), 2025. Benchmarked
-    logistic regression, a 200-tree random forest and a three-layer DNN on 64,374 records; the DNN reached
-    94.1% accuracy and 95.7% ROC-AUC against an 83.6% linear baseline.
-    <a href="https://www.ijser.in/archives/v13i10/SE251005174007.pdf" style="color:var(--acc);text-decoration:none;">Paper</a>.</p>
-  </div>
- 
-  <h2>Before this</h2>
-  <div class="item">
-    <b>ByteBuilders</b>
-    <p>Mentored 15 students weekly for a full academic year in coding, AI tools and app development. Open to
-    the whole school rather than CS students only, and people worked on whatever they wanted.</p>
-  </div>
-  <div class="item">
-    <b>Fueladream x Go Girl Foundation</b>
-    <p>Ran a crowdfunding campaign for reusable sanitary pads in rural Rajasthan. Closed at 290% of target
-    from 52 individual funders, most giving a few dollars each. Delivered the pads in person.</p>
-  </div>
-  <div class="item">
-    <b>Audio-Visual Squad, The Scindia School</b>
-    <p>Secretary. Five-person team on sound, lighting and projection for daily assemblies and 30+ events.</p>
-  </div>
- 
-  <footer>Last updated September 2026.</footer>
-</div>
+
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>
- 
-
-→
