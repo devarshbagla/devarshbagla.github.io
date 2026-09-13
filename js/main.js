@@ -1,6 +1,7 @@
 import { initTheme } from "./theme.js";
 import { initScope } from "./scope.js";
 import { initReveal, initScrollProgress } from "./reveal.js";
+import { initDeskPulse, initProjectCards } from "./deskpulse.js";
 
 function initHeaderScroll() {
   const header = document.querySelector("[data-site-header]");
@@ -118,3 +119,5 @@ initMobileNav();
 initScope();
 initReveal();
 initScrollProgress();
+initDeskPulse();
+initProjectCards();
