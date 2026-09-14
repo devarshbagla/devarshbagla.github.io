@@ -118,6 +118,8 @@ function initMobileNav() {
   }
 }
 
+document.documentElement.setAttribute("data-hydrated", "true");
+
 initTheme();
 initHeaderScroll();
 initMobileNav();

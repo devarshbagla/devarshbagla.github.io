@@ -1,274 +1,846 @@
 /**
- * Oscilloscope canvas — DeskPulse metaphor.
- * Three summed sines, pointer-driven freq/amp with lerp, grid + glow,
- * 10 Hz readout, DPR-aware, pauses offscreen / when hidden / reduced-motion.
+ * Hero signal workbench.
+ *
+ * A real Web Audio graph drives every mode: seven partial oscillators sum into a
+ * gain stage, through an AnalyserNode, then into a permanently silent gain before
+ * the destination. Nothing is ever audible — the graph exists so the FFT is a
+ * genuine FFT of a genuine signal rather than drawn maths.
+ *
+ *   oscA[1..7] -> partialGain -> ampA -> analyserA -+
+ *   oscB[1..7] -> partialGain -> ampB -> delayB -> analyserB -+-> mute(0) -> out
+ *
+ * Channel B is channel A at a Lissajous ratio through a quarter-period delay, so
+ * the X/Y plot traces a real phase figure instead of a straight line.
+ *
+ * Browsers refuse to start an AudioContext before a user gesture. Until then the
+ * scope renders a cold frame captured from an OfflineAudioContext running the same
+ * oscillator bank through the same AnalyserNode — still real, just not live.
  */
 
-const IDLE_FREQ = 2.4;
+import {
+  clamp,
+  cssVar,
+  fitCanvas,
+  cssSize,
+  debounce,
+  lerp,
+  onReducedMotionChange,
+  onThemeChange,
+  prefersReducedMotion,
+  store,
+} from "./util.js";
+
+const MODES = ["WAVEFORM", "SPECTRUM", "LISSAJOUS"];
+const MODE_KEY = "scope:mode";
+
+const PARTIALS_MAX = 7;
+const FFT_SIZE = 2048;
+const SPECTRUM_BARS = 48;
+const SPECTRUM_TOP_HZ = 7000;
+/* Log frequency axis, the way a real spectrum analyser lays out audio. */
+const SPECTRUM_LO_HZ = 50;
+const SPECTRUM_HI_HZ = 8000;
+
+const FREQ_MIN = 55;
+const FREQ_MAX = 880;
+const AMP_MIN = 0.08;
+const AMP_MAX = 1;
+
+const IDLE_FREQ = 174;
 const IDLE_AMP = 0.62;
-const LERP = 0.08;
+const IDLE_PARTIALS = 3;
+
+const EASE = 0.09;
 const READOUT_MS = 100;
+const DRAG_PX_PER_PARTIAL = 34;
 
-function cssVar(name, fallback) {
-  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return v || fallback;
+/** Lissajous X:Y ratio for each harmonic count, 1 through 7. */
+const LISSAJOUS_RATIO = [1, 3 / 2, 2, 5 / 3, 3, 5 / 2, 4];
+
+const CONTROL_HINT =
+  "Pointer position sets frequency and amplitude; drag vertically for harmonic count. " +
+  "With keyboard focus, left and right arrows change frequency, up and down change " +
+  "amplitude, shift with up or down changes harmonic count, and M cycles the mode.";
+
+function bankNorm(count) {
+  let sum = 0;
+  for (let n = 1; n <= count; n += 1) sum += 1 / n;
+  return sum;
 }
 
-function lerp(a, b, t) {
-  return a + (b - a) * t;
+/** Build a 7-partial bank on any BaseAudioContext. Amplitude falls as 1/n. */
+function buildBank(ctx, baseFreq, amp, partials, ratio) {
+  const out = ctx.createGain();
+  out.gain.value = amp;
+  const norm = bankNorm(partials);
+  const oscillators = [];
+  for (let n = 1; n <= PARTIALS_MAX; n += 1) {
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.value = baseFreq * ratio * n;
+    const gain = ctx.createGain();
+    gain.gain.value = n <= partials ? 1 / n / norm : 0;
+    osc.connect(gain);
+    gain.connect(out);
+    oscillators.push({ osc, gain });
+  }
+  return { out, oscillators };
 }
 
-function clamp(n, min, max) {
-  return Math.min(max, Math.max(min, n));
+/**
+ * Capture one frame of genuine analyser data without needing a user gesture.
+ * OfflineAudioContext.suspend() lets us read the AnalyserNode mid-render.
+ */
+async function coldCapture(params) {
+  const OfflineCtx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  if (!OfflineCtx) return null;
+
+  const sampleRate = 44100;
+  const length = 8192;
+  let ctx;
+  try {
+    ctx = new OfflineCtx(2, length, sampleRate);
+  } catch {
+    return null;
+  }
+
+  const ratio = LISSAJOUS_RATIO[params.partials - 1] || 1;
+  const bankA = buildBank(ctx, params.freq, params.amp, params.partials, 1);
+  const bankB = buildBank(ctx, params.freq, params.amp, params.partials, ratio);
+
+  const delay = ctx.createDelay(0.1);
+  delay.delayTime.value = clamp(0.25 / (params.freq * ratio), 0, 0.09);
+
+  const analyserA = ctx.createAnalyser();
+  analyserA.fftSize = FFT_SIZE;
+  analyserA.smoothingTimeConstant = 0;
+  const analyserB = ctx.createAnalyser();
+  analyserB.fftSize = FFT_SIZE;
+  analyserB.smoothingTimeConstant = 0;
+
+  bankA.out.connect(analyserA);
+  bankB.out.connect(delay);
+  delay.connect(analyserB);
+
+  const merger = ctx.createChannelMerger(2);
+  analyserA.connect(merger, 0, 0);
+  analyserB.connect(merger, 0, 1);
+  merger.connect(ctx.destination);
+
+  bankA.oscillators.forEach(({ osc }) => osc.start(0));
+  bankB.oscillators.forEach(({ osc }) => osc.start(0));
+
+  let captured = null;
+  const captureAt = 4096 / sampleRate;
+  if (typeof ctx.suspend === "function") {
+    ctx
+      .suspend(captureAt)
+      .then(() => {
+        const time = new Uint8Array(analyserA.fftSize);
+        const timeB = new Uint8Array(analyserB.fftSize);
+        const freq = new Uint8Array(analyserA.frequencyBinCount);
+        analyserA.getByteTimeDomainData(time);
+        analyserB.getByteTimeDomainData(timeB);
+        analyserA.getByteFrequencyData(freq);
+        captured = { time, timeB, freq, sampleRate };
+        return ctx.resume();
+      })
+      .catch(() => {
+        /* suspend unsupported — fall back to the rendered buffer below */
+      });
+  }
+
+  let buffer;
+  try {
+    buffer = await ctx.startRendering();
+  } catch {
+    return null;
+  }
+  if (captured) return captured;
+
+  // Fallback: read the rendered buffer directly. Time domain only.
+  const left = buffer.getChannelData(0);
+  const right = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : left;
+  const time = new Uint8Array(FFT_SIZE);
+  const timeB = new Uint8Array(FFT_SIZE);
+  for (let i = 0; i < FFT_SIZE; i += 1) {
+    time[i] = clamp(Math.round(left[i] * 128 + 128), 0, 255);
+    timeB[i] = clamp(Math.round(right[i] * 128 + 128), 0, 255);
+  }
+  return { time, timeB, freq: null, sampleRate };
 }
 
 export function initScope(root = document) {
   const host = root.querySelector("[data-scope]");
-  const canvas = root.querySelector("[data-scope-canvas]");
+  const frame = root.querySelector("[data-scope-frame]");
+  const gridCanvas = root.querySelector("[data-scope-grid]");
+  const traceCanvas = root.querySelector("[data-scope-canvas]");
   const readout = root.querySelector("[data-scope-readout]");
-  if (!host || !canvas) return;
+  const statusEl = root.querySelector("[data-scope-status]");
+  const modeBtn = root.querySelector("[data-scope-mode]");
+  const modeLabel = root.querySelector("[data-scope-mode-label]");
+  const stateEl = root.querySelector("[data-scope-state]");
+  if (!host || !frame || !gridCanvas || !traceCanvas) return;
 
-  const ctx = canvas.getContext("2d", { alpha: true });
-  if (!ctx) return;
+  const gridCtx = gridCanvas.getContext("2d");
+  const traceCtx = traceCanvas.getContext("2d", { alpha: true });
+  if (!gridCtx || !traceCtx) return;
 
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const stored = store.get(MODE_KEY, "");
+  let mode = MODES.includes(stored) ? stored : MODES[0];
 
-  let width = 0;
-  let height = 0;
-  let dpr = 1;
-  let raf = 0;
-  let running = false;
-  let visible = true;
-  let pageHidden = document.hidden;
-
-  let phase = 0;
   let freq = IDLE_FREQ;
   let amp = IDLE_AMP;
+  let partials = IDLE_PARTIALS;
   let targetFreq = IDLE_FREQ;
   let targetAmp = IDLE_AMP;
-  let pointerInside = false;
 
-  let lastFrame = 0;
+  let audio = null;
+  let armed = false;
+  let armPending = false;
+  let cold = null;
+  let peakHz = 0;
+  let peakBin = 0;
+
+  let raf = 0;
+  let running = false;
+  let onScreen = true;
   let lastReadout = 0;
 
-  function resize() {
-    const rect = canvas.getBoundingClientRect();
-    const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = Math.max(1, Math.floor(rect.width));
-    const h = Math.max(1, Math.floor(rect.height));
-    if (w === width && h === height && nextDpr === dpr) return;
-    width = w;
-    height = h;
-    dpr = nextDpr;
-    canvas.width = Math.floor(w * dpr);
-    canvas.height = Math.floor(h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
+  /* ---------------------------------------------------------------- canvas */
 
-  function drawGrid() {
+  function paintGrid() {
+    const { width, height } = cssSize(gridCanvas);
     const line = cssVar("--line", "#2a2622");
-    const inkMuted = cssVar("--ink-muted", "#9a9086");
+    const ink = cssVar("--ink-muted", "#b0a89e");
 
-    ctx.save();
-    ctx.lineWidth = 1;
+    gridCtx.clearRect(0, 0, width, height);
+    gridCtx.save();
+    gridCtx.lineWidth = 1;
+    gridCtx.strokeStyle = line;
+    gridCtx.globalAlpha = 0.6;
 
-    const major = 40;
-    ctx.strokeStyle = line;
-    ctx.globalAlpha = 0.55;
-    ctx.beginPath();
-    for (let x = 0; x <= width; x += major) {
-      ctx.moveTo(x + 0.5, 0);
-      ctx.lineTo(x + 0.5, height);
+    const divX = 10;
+    const divY = 8;
+    gridCtx.beginPath();
+    for (let i = 1; i < divX; i += 1) {
+      const x = Math.round((width / divX) * i) + 0.5;
+      gridCtx.moveTo(x, 0);
+      gridCtx.lineTo(x, height);
     }
-    for (let y = 0; y <= height; y += major) {
-      ctx.moveTo(0, y + 0.5);
-      ctx.lineTo(width, y + 0.5);
+    for (let i = 1; i < divY; i += 1) {
+      const y = Math.round((height / divY) * i) + 0.5;
+      gridCtx.moveTo(0, y);
+      gridCtx.lineTo(width, y);
     }
-    ctx.stroke();
+    gridCtx.stroke();
 
-    // Brighter centre axes
-    ctx.globalAlpha = 0.9;
-    ctx.strokeStyle = inkMuted;
-    ctx.beginPath();
-    ctx.moveTo(0, height / 2 + 0.5);
-    ctx.lineTo(width, height / 2 + 0.5);
-    ctx.moveTo(width / 2 + 0.5, 0);
-    ctx.lineTo(width / 2 + 0.5, height);
-    ctx.stroke();
-    ctx.restore();
+    gridCtx.globalAlpha = 0.85;
+    gridCtx.strokeStyle = ink;
+    const midY = Math.round(height / 2) + 0.5;
+    const midX = Math.round(width / 2) + 0.5;
+    gridCtx.beginPath();
+    gridCtx.moveTo(0, midY);
+    gridCtx.lineTo(width, midY);
+    gridCtx.moveTo(midX, 0);
+    gridCtx.lineTo(midX, height);
+    gridCtx.stroke();
+
+    // Minor ticks along the centre axes, five per division.
+    gridCtx.globalAlpha = 0.5;
+    gridCtx.beginPath();
+    const stepX = width / divX / 5;
+    for (let x = stepX; x < width; x += stepX) {
+      const px = Math.round(x) + 0.5;
+      gridCtx.moveTo(px, midY - 3);
+      gridCtx.lineTo(px, midY + 3);
+    }
+    const stepY = height / divY / 5;
+    for (let y = stepY; y < height; y += stepY) {
+      const py = Math.round(y) + 0.5;
+      gridCtx.moveTo(midX - 3, py);
+      gridCtx.lineTo(midX + 3, py);
+    }
+    gridCtx.stroke();
+    gridCtx.restore();
   }
 
-  function sample(xNorm, tPhase, f, a) {
-    const x = xNorm * Math.PI * 2;
-    const w1 = Math.sin(x * f + tPhase) * a;
-    const w2 = Math.sin(x * f * 2.15 + tPhase * 1.37) * a * 0.45;
-    const w3 = Math.sin(x * f * 0.55 + tPhase * 0.61) * a * 0.3;
-    return w1 + w2 + w3;
+  function fadeTrace(alpha) {
+    const { width, height } = cssSize(traceCanvas);
+    traceCtx.save();
+    traceCtx.globalCompositeOperation = "destination-out";
+    traceCtx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+    traceCtx.fillRect(0, 0, width, height);
+    traceCtx.restore();
   }
 
-  function drawWave() {
+  function clearTrace() {
+    const { width, height } = cssSize(traceCanvas);
+    traceCtx.clearRect(0, 0, width, height);
+  }
+
+  function strokeTrace(build, glow = true) {
     const accent = cssVar("--accent", "#e2703a");
+    traceCtx.save();
+    traceCtx.lineJoin = "round";
+    traceCtx.lineCap = "round";
+    traceCtx.strokeStyle = accent;
+    if (glow) {
+      traceCtx.globalAlpha = 0.32;
+      traceCtx.lineWidth = 3.5;
+      traceCtx.shadowColor = accent;
+      traceCtx.shadowBlur = 14;
+      traceCtx.beginPath();
+      build(traceCtx);
+      traceCtx.stroke();
+      traceCtx.shadowBlur = 0;
+    }
+    traceCtx.globalAlpha = 1;
+    traceCtx.lineWidth = 1.4;
+    traceCtx.beginPath();
+    build(traceCtx);
+    traceCtx.stroke();
+    traceCtx.restore();
+  }
+
+  /* ------------------------------------------------------------ mode draws */
+
+  /** Rising-edge trigger, so the trace sits still like a real scope. */
+  function triggerOffset(data) {
+    const limit = Math.floor(data.length / 2);
+    for (let i = 1; i < limit; i += 1) {
+      if (data[i - 1] < 128 && data[i] >= 128) return i;
+    }
+    return 0;
+  }
+
+  function drawWaveform(time) {
+    if (!time) return;
+    const { width, height } = cssSize(traceCanvas);
     const mid = height / 2;
-    const scale = height * 0.32;
-
-    ctx.save();
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-
-    // Soft glow underlay
-    ctx.beginPath();
-    for (let px = 0; px <= width; px++) {
-      const y = mid - sample(px / width, phase, freq, amp) * scale;
-      if (px === 0) ctx.moveTo(px, y);
-      else ctx.lineTo(px, y);
-    }
-    ctx.strokeStyle = accent;
-    ctx.globalAlpha = 0.35;
-    ctx.lineWidth = 4;
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = 18;
-    ctx.stroke();
-
-    // Crisp trace
-    ctx.beginPath();
-    for (let px = 0; px <= width; px++) {
-      const y = mid - sample(px / width, phase, freq, amp) * scale;
-      if (px === 0) ctx.moveTo(px, y);
-      else ctx.lineTo(px, y);
-    }
-    ctx.globalAlpha = 1;
-    ctx.lineWidth = 1.5;
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = accent;
-    ctx.stroke();
-    ctx.restore();
+    const scale = height * 0.42;
+    const start = triggerOffset(time);
+    const span = Math.min(time.length - start, Math.floor(time.length / 2));
+    strokeTrace((ctx) => {
+      for (let px = 0; px <= width; px += 1) {
+        const idx = start + Math.floor((px / width) * (span - 1));
+        const v = (time[idx] - 128) / 128;
+        const y = mid - v * scale;
+        if (px === 0) ctx.moveTo(px, y);
+        else ctx.lineTo(px, y);
+      }
+    });
   }
 
-  function paint() {
-    ctx.clearRect(0, 0, width, height);
-    drawGrid();
-    drawWave();
+  function findPeak(freqData, sampleRate) {
+    if (!freqData) return;
+    const binHz = sampleRate / FFT_SIZE;
+    const topBin = Math.min(freqData.length, Math.ceil(SPECTRUM_TOP_HZ / binHz));
+    let best = 0;
+    let bestBin = 0;
+    for (let i = 1; i < topBin; i += 1) {
+      if (freqData[i] > best) {
+        best = freqData[i];
+        bestBin = i;
+      }
+    }
+    peakBin = bestBin;
+    peakHz = best > 0 ? bestBin * binHz : 0;
   }
 
-  function updateReadout(now) {
-    if (!readout || now - lastReadout < READOUT_MS) return;
-    lastReadout = now;
-    const phaseWrapped = ((phase % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+  function drawSpectrum(freqData, sampleRate) {
+    if (!freqData) return;
+    const { width, height } = cssSize(traceCanvas);
+    const binHz = sampleRate / FFT_SIZE;
+    const maxBin = freqData.length - 1;
+    const logLo = Math.log(SPECTRUM_LO_HZ);
+    const logSpan = Math.log(SPECTRUM_HI_HZ) - logLo;
+    const accent = cssVar("--accent", "#e2703a");
+    const gap = 2;
+    const barW = Math.max(1, width / SPECTRUM_BARS - gap);
+
+    traceCtx.save();
+    traceCtx.fillStyle = accent;
+    traceCtx.shadowColor = accent;
+    for (let b = 0; b < SPECTRUM_BARS; b += 1) {
+      const fLo = Math.exp(logLo + (logSpan * b) / SPECTRUM_BARS);
+      const fHi = Math.exp(logLo + (logSpan * (b + 1)) / SPECTRUM_BARS);
+      const iLo = clamp(Math.round(fLo / binHz), 0, maxBin);
+      const iHi = clamp(Math.max(iLo, Math.round(fHi / binHz) - 1), 0, maxBin);
+      let level = 0;
+      for (let i = iLo; i <= iHi; i += 1) level = Math.max(level, freqData[i]);
+      const v = level / 255;
+      // Leave headroom at the top so bars never collide with the readout.
+      const h = Math.max(v > 0.01 ? 1.5 : 0, v * height * 0.78);
+      if (h <= 0) continue;
+      const x = (width / SPECTRUM_BARS) * b + gap / 2;
+      traceCtx.globalAlpha = 0.28;
+      traceCtx.shadowBlur = 10;
+      traceCtx.fillRect(x, height - h, barW, h);
+      traceCtx.globalAlpha = 0.95;
+      traceCtx.shadowBlur = 0;
+      traceCtx.fillRect(x, height - h, barW, h);
+    }
+    traceCtx.restore();
+  }
+
+  function drawLissajous(timeX, timeY) {
+    if (!timeX || !timeY) return;
+    const { width, height } = cssSize(traceCanvas);
+    const cx = width / 2;
+    const cy = height / 2;
+    const scale = Math.min(width, height) * 0.42;
+    const count = Math.min(timeX.length, timeY.length, 1024);
+    strokeTrace((ctx) => {
+      for (let i = 0; i < count; i += 1) {
+        const x = cx + ((timeX[i] - 128) / 128) * scale;
+        const y = cy - ((timeY[i] - 128) / 128) * scale;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+    });
+  }
+
+  /* ----------------------------------------------------------- audio graph */
+
+  function createAudio() {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    let ctx;
+    try {
+      ctx = new AudioCtx({ latencyHint: "interactive" });
+    } catch {
+      return null;
+    }
+
+    const ratio = LISSAJOUS_RATIO[partials - 1] || 1;
+    const bankA = buildBank(ctx, freq, amp, partials, 1);
+    const bankB = buildBank(ctx, freq, amp, partials, ratio);
+
+    const delay = ctx.createDelay(0.1);
+    delay.delayTime.value = clamp(0.25 / (freq * ratio), 0, 0.09);
+
+    const analyserA = ctx.createAnalyser();
+    analyserA.fftSize = FFT_SIZE;
+    analyserA.smoothingTimeConstant = 0.72;
+    const analyserB = ctx.createAnalyser();
+    analyserB.fftSize = FFT_SIZE;
+    analyserB.smoothingTimeConstant = 0;
+
+    // The only path to the speakers runs through a gain pinned at zero.
+    const mute = ctx.createGain();
+    mute.gain.value = 0;
+
+    bankA.out.connect(analyserA);
+    bankB.out.connect(delay);
+    delay.connect(analyserB);
+    analyserA.connect(mute);
+    analyserB.connect(mute);
+    mute.connect(ctx.destination);
+
+    bankA.oscillators.forEach(({ osc }) => osc.start());
+    bankB.oscillators.forEach(({ osc }) => osc.start());
+
+    return {
+      ctx,
+      bankA,
+      bankB,
+      delay,
+      analyserA,
+      analyserB,
+      time: new Uint8Array(analyserA.fftSize),
+      timeB: new Uint8Array(analyserB.fftSize),
+      freq: new Uint8Array(analyserA.frequencyBinCount),
+    };
+  }
+
+  let pushedFreq = -1;
+  let pushedAmp = -1;
+  let pushedPartials = -1;
+
+  function pushParams() {
+    if (!audio) return;
+    const settled =
+      Math.abs(freq - pushedFreq) < 0.05 &&
+      Math.abs(amp - pushedAmp) < 0.002 &&
+      partials === pushedPartials;
+    if (settled) return;
+    pushedFreq = freq;
+    pushedAmp = amp;
+    pushedPartials = partials;
+    const { ctx, bankA, bankB, delay } = audio;
+    const now = ctx.currentTime;
+    const ratio = LISSAJOUS_RATIO[partials - 1] || 1;
+    const norm = bankNorm(partials);
+    for (let i = 0; i < PARTIALS_MAX; i += 1) {
+      const n = i + 1;
+      const level = n <= partials ? 1 / n / norm : 0;
+      bankA.oscillators[i].osc.frequency.setTargetAtTime(freq * n, now, 0.02);
+      bankB.oscillators[i].osc.frequency.setTargetAtTime(freq * ratio * n, now, 0.02);
+      bankA.oscillators[i].gain.gain.setTargetAtTime(level, now, 0.03);
+      bankB.oscillators[i].gain.gain.setTargetAtTime(level, now, 0.03);
+    }
+    bankA.out.gain.setTargetAtTime(amp, now, 0.03);
+    bankB.out.gain.setTargetAtTime(amp, now, 0.03);
+    delay.delayTime.setTargetAtTime(clamp(0.25 / (freq * ratio), 0, 0.09), now, 0.03);
+  }
+
+  async function arm() {
+    if (armed || armPending) return;
+    armPending = true;
+    if (!audio) audio = createAudio();
+    if (!audio) {
+      armPending = false;
+      return;
+    }
+    try {
+      if (audio.ctx.state !== "running") await audio.ctx.resume();
+    } catch {
+      /* blocked — stay cold */
+    }
+    armPending = false;
+    armed = audio.ctx.state === "running";
+    if (armed) {
+      clearTrace();
+      setState();
+      syncLoop();
+    }
+  }
+
+  /** Only touch an AudioContext once the browser has seen a real gesture. */
+  function armOnGesture() {
+    if (prefersReducedMotion()) return;
+    arm();
+  }
+
+  function watchForActivation() {
+    const activation = navigator.userActivation;
+    if (activation && activation.hasBeenActive) {
+      armOnGesture();
+      return;
+    }
+    const opts = { passive: true };
+    const once = () => {
+      document.removeEventListener("pointerdown", once, opts);
+      document.removeEventListener("keydown", once, opts);
+      document.removeEventListener("touchstart", once, opts);
+      armOnGesture();
+    };
+    document.addEventListener("pointerdown", once, opts);
+    document.addEventListener("keydown", once, opts);
+    document.addEventListener("touchstart", once, opts);
+  }
+
+  /* -------------------------------------------------------------- readouts */
+
+  function setState() {
+    if (!stateEl) return;
+    const live = armed && running;
+    stateEl.textContent = live ? "LIVE" : "IDLE";
+    stateEl.classList.toggle("is-live", live);
+  }
+
+  function writeReadout() {
+    if (!readout) return;
+    const peak = peakHz > 0 ? `${Math.round(peakHz)} Hz · B${peakBin}` : "—";
     readout.textContent =
-      `FREQ ${freq.toFixed(2)} Hz   AMP ${amp.toFixed(2)}   PHASE ${phaseWrapped.toFixed(2)} rad`;
+      `FREQ ${freq.toFixed(1).padStart(5, " ")} Hz` +
+      `   AMP ${amp.toFixed(2)}` +
+      `   HARM ${partials}` +
+      `   PEAK ${peak}`;
   }
 
-  function frame(now) {
+  function announce(text) {
+    if (!statusEl) return;
+    statusEl.textContent = text;
+  }
+
+  /* ------------------------------------------------------------- cold path */
+
+  const refreshCold = debounce(async () => {
+    cold = await coldCapture({ freq, amp, partials });
+    if (!armed) paintCold();
+  }, 90);
+
+  function paintCold() {
+    clearTrace();
+    if (!cold) {
+      writeReadout();
+      return;
+    }
+    findPeak(cold.freq, cold.sampleRate);
+    if (mode === "SPECTRUM") drawSpectrum(cold.freq, cold.sampleRate);
+    else if (mode === "LISSAJOUS") drawLissajous(cold.time, cold.timeB);
+    else drawWaveform(cold.time);
+    writeReadout();
+    setState();
+  }
+
+  /* ------------------------------------------------------------- rAF frame */
+
+  function tick(now) {
     if (!running) return;
-    raf = requestAnimationFrame(frame);
+    raf = requestAnimationFrame(tick);
 
-    const dt = lastFrame ? Math.min(0.05, (now - lastFrame) / 1000) : 0.016;
-    lastFrame = now;
+    freq = lerp(freq, targetFreq, EASE);
+    amp = lerp(amp, targetAmp, EASE);
+    pushParams();
 
-    freq = lerp(freq, targetFreq, LERP);
-    amp = lerp(amp, targetAmp, LERP);
-    phase += dt * freq * Math.PI * 2 * 0.35;
+    const { analyserA, analyserB, time, timeB, freq: freqData, ctx } = audio;
+    analyserA.getByteTimeDomainData(time);
+    analyserA.getByteFrequencyData(freqData);
+    findPeak(freqData, ctx.sampleRate);
 
-    paint();
-    updateReadout(now);
+    fadeTrace(mode === "SPECTRUM" ? 0.55 : 0.2);
+
+    if (mode === "SPECTRUM") {
+      drawSpectrum(freqData, ctx.sampleRate);
+    } else if (mode === "LISSAJOUS") {
+      analyserB.getByteTimeDomainData(timeB);
+      drawLissajous(time, timeB);
+    } else {
+      drawWaveform(time);
+    }
+
+    if (now - lastReadout >= READOUT_MS) {
+      lastReadout = now;
+      writeReadout();
+    }
   }
 
   function start() {
-    if (running || reducedMotion.matches || !visible || pageHidden) return;
+    if (running || !armed || !onScreen || document.hidden) return;
+    if (prefersReducedMotion()) return;
     running = true;
-    lastFrame = 0;
-    raf = requestAnimationFrame(frame);
+    lastReadout = 0;
+    if (audio && audio.ctx.state === "suspended") audio.ctx.resume().catch(() => {});
+    raf = requestAnimationFrame(tick);
+    setState();
   }
 
   function stop() {
     running = false;
     if (raf) cancelAnimationFrame(raf);
     raf = 0;
+    if (audio && audio.ctx.state === "running") audio.ctx.suspend().catch(() => {});
+    setState();
   }
 
   function syncLoop() {
-    if (reducedMotion.matches) {
+    if (prefersReducedMotion()) {
       stop();
-      resize();
-      freq = IDLE_FREQ;
-      amp = IDLE_AMP;
-      paint();
-      updateReadout(performance.now());
+      refreshCold();
       return;
     }
-    if (visible && !pageHidden) start();
-    else {
-      stop();
-      // Keep last painted frame visible
-    }
+    if (armed && onScreen && !document.hidden) start();
+    else stop();
   }
 
-  function onPointerMove(event) {
-    if (reducedMotion.matches) return;
-    const rect = canvas.getBoundingClientRect();
+  /* --------------------------------------------------------------- controls */
+
+  function setMode(next, { announceChange = true } = {}) {
+    mode = MODES.includes(next) ? next : MODES[0];
+    store.set(MODE_KEY, mode);
+    if (modeLabel) modeLabel.textContent = mode;
+    if (modeBtn) {
+      modeBtn.setAttribute(
+        "aria-label",
+        `Visualisation mode: ${mode.toLowerCase()}. Activate to cycle modes.`
+      );
+    }
+    frame.setAttribute("aria-label", `${describeMode()} ${CONTROL_HINT}`);
+    peakHz = 0;
+    peakBin = 0;
+    clearTrace();
+    if (!armed || prefersReducedMotion()) paintCold();
+    if (announceChange) announce(`Mode ${mode.toLowerCase()}.`);
+  }
+
+  function describeMode() {
+    if (mode === "SPECTRUM") {
+      return "Spectrum analyser: FFT bars of the generated harmonic series.";
+    }
+    if (mode === "LISSAJOUS") {
+      return "Lissajous plot: the signal against a phase-shifted copy of itself.";
+    }
+    return "Oscilloscope trace of the generated waveform.";
+  }
+
+  function cycleMode() {
+    setMode(MODES[(MODES.indexOf(mode) + 1) % MODES.length]);
+  }
+
+  function setPartials(next, { silent = false } = {}) {
+    const clamped = clamp(Math.round(next), 1, PARTIALS_MAX);
+    if (clamped === partials) return;
+    partials = clamped;
+    if (!silent) announce(`${partials} ${partials === 1 ? "partial" : "partials"}.`);
+    writeReadout();
+    if (!armed || prefersReducedMotion()) refreshCold();
+  }
+
+  function pointerToTargets(event) {
+    const rect = frame.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     const x = clamp((event.clientX - rect.left) / rect.width, 0, 1);
     const y = clamp((event.clientY - rect.top) / rect.height, 0, 1);
-    // Right → higher frequency; up → higher amplitude
-    targetFreq = lerp(0.8, 5.2, x);
-    targetAmp = lerp(1.0, 0.18, y);
-    pointerInside = true;
+    targetFreq = lerp(FREQ_MIN, FREQ_MAX, x * x);
+    targetAmp = lerp(AMP_MAX, AMP_MIN, y);
   }
 
-  function onPointerLeave() {
-    pointerInside = false;
+  let dragId = null;
+  let dragStartY = 0;
+  let dragStartPartials = partials;
+
+  frame.addEventListener("pointermove", (event) => {
+    if (dragId !== null) {
+      const dy = dragStartY - event.clientY;
+      setPartials(dragStartPartials + dy / DRAG_PX_PER_PARTIAL, { silent: true });
+      return;
+    }
+    pointerToTargets(event);
+    if (prefersReducedMotion()) {
+      freq = targetFreq;
+      amp = targetAmp;
+      refreshCold();
+    }
+  });
+
+  frame.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
+    dragId = event.pointerId;
+    dragStartY = event.clientY;
+    dragStartPartials = partials;
+    frame.setPointerCapture(event.pointerId);
+    frame.classList.add("is-dragging");
+  });
+
+  function endDrag(event) {
+    if (dragId === null) return;
+    if (frame.hasPointerCapture(event.pointerId)) {
+      frame.releasePointerCapture(event.pointerId);
+    }
+    dragId = null;
+    frame.classList.remove("is-dragging");
+    announce(`${partials} ${partials === 1 ? "partial" : "partials"}.`);
+    if (!armed || prefersReducedMotion()) refreshCold();
+  }
+
+  frame.addEventListener("pointerup", endDrag);
+  frame.addEventListener("pointercancel", endDrag);
+
+  frame.addEventListener("pointerleave", () => {
+    if (dragId !== null) return;
     targetFreq = IDLE_FREQ;
     targetAmp = IDLE_AMP;
+    if (prefersReducedMotion()) {
+      freq = IDLE_FREQ;
+      amp = IDLE_AMP;
+      refreshCold();
+    }
+  });
+
+  frame.addEventListener("keydown", (event) => {
+    const step = event.shiftKey ? 1 : 0;
+    let handled = true;
+    switch (event.key) {
+      case "ArrowRight":
+        targetFreq = clamp(targetFreq * 1.09, FREQ_MIN, FREQ_MAX);
+        break;
+      case "ArrowLeft":
+        targetFreq = clamp(targetFreq / 1.09, FREQ_MIN, FREQ_MAX);
+        break;
+      case "ArrowUp":
+        if (step) setPartials(partials + 1);
+        else targetAmp = clamp(targetAmp + 0.08, AMP_MIN, AMP_MAX);
+        break;
+      case "ArrowDown":
+        if (step) setPartials(partials - 1);
+        else targetAmp = clamp(targetAmp - 0.08, AMP_MIN, AMP_MAX);
+        break;
+      case "m":
+      case "M":
+        cycleMode();
+        break;
+      default:
+        handled = false;
+    }
+    if (!handled) return;
+    event.preventDefault();
+    if (!event.shiftKey && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
+      announce(`Amplitude ${targetAmp.toFixed(2)}.`);
+    }
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      announce(`Frequency ${Math.round(targetFreq)} hertz.`);
+    }
+    if (prefersReducedMotion()) {
+      freq = targetFreq;
+      amp = targetAmp;
+      refreshCold();
+    }
+  });
+
+  if (modeBtn) {
+    modeBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      cycleMode();
+    });
   }
 
-  // Debounced resize
-  let resizeTimer = 0;
-  const ro = new ResizeObserver(() => {
-    clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(() => {
-      resize();
-      paint();
-      if (!running && reducedMotion.matches) updateReadout(performance.now());
-    }, 80);
-  });
-  ro.observe(canvas);
+  /* ------------------------------------------------------------ lifecycles */
+
+  const resize = () => {
+    const changedGrid = fitCanvas(gridCanvas, gridCtx);
+    const changedTrace = fitCanvas(traceCanvas, traceCtx);
+    if (changedGrid) paintGrid();
+    if (changedTrace && (!armed || prefersReducedMotion())) paintCold();
+  };
+
+  const resizeDebounced = debounce(() => {
+    resize();
+    paintGrid();
+  }, 90);
+
+  const ro = new ResizeObserver(resizeDebounced);
+  ro.observe(frame);
 
   const io = new IntersectionObserver(
     (entries) => {
-      visible = entries.some((e) => e.isIntersecting);
+      onScreen = entries.some((entry) => entry.isIntersecting);
       syncLoop();
     },
-    { threshold: 0.05 }
+    { threshold: 0.02 }
   );
   io.observe(host);
 
-  document.addEventListener("visibilitychange", () => {
-    pageHidden = document.hidden;
-    syncLoop();
+  document.addEventListener("visibilitychange", syncLoop);
+
+  onReducedMotionChange(() => {
+    if (prefersReducedMotion()) {
+      stop();
+      refreshCold();
+    } else {
+      watchForActivation();
+      syncLoop();
+    }
   });
 
-  if (typeof reducedMotion.addEventListener === "function") {
-    reducedMotion.addEventListener("change", syncLoop);
-  } else if (typeof reducedMotion.addListener === "function") {
-    reducedMotion.addListener(syncLoop);
-  }
-
-  // Theme changes retint the wave
-  const themeObserver = new MutationObserver(() => {
-    paint();
-  });
-  themeObserver.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ["data-theme"],
+  onThemeChange(() => {
+    paintGrid();
+    if (!armed || prefersReducedMotion()) paintCold();
   });
 
-  canvas.addEventListener("pointermove", onPointerMove);
-  canvas.addEventListener("pointerenter", onPointerMove);
-  canvas.addEventListener("pointerleave", onPointerLeave);
-  canvas.style.touchAction = "none";
+  /* ------------------------------------------------------------------ boot */
 
+  traceCanvas.style.touchAction = "none";
   resize();
-  paint();
-  updateReadout(performance.now());
-  syncLoop();
+  paintGrid();
+  setMode(mode, { announceChange: false });
+  writeReadout();
+  setState();
+  coldCapture({ freq, amp, partials }).then((data) => {
+    cold = data;
+    if (!armed) paintCold();
+  });
+  if (!prefersReducedMotion()) watchForActivation();
 }

@@ -35,6 +35,7 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/sections.css">
+  <link rel="stylesheet" href="css/instrument.css">
 
   <!-- Prevent flash of wrong theme before CSS/JS hydrate -->
   <script>
@@ -57,6 +58,29 @@
       }
     })();
   </script>
+
+  <!-- Opened straight off disk, Chromium refuses to load ES modules over file://.
+       If the module layer never reports in, drop every progressive-enhancement
+       hook so the page is still fully readable. -->
+  <script>
+    (function () {
+      var html = document.documentElement;
+      function settle() {
+        window.setTimeout(function () {
+          if (html.getAttribute("data-hydrated") !== "true") {
+            html.classList.add("no-js-modules");
+          }
+        }, 700);
+      }
+      if (document.readyState === "complete") settle();
+      else window.addEventListener("load", settle);
+    })();
+  </script>
+  <noscript>
+    <style>
+      [data-reveal] { opacity: 1 !important; transform: none !important; }
+    </style>
+  </noscript>
 
   <script type="application/ld+json">
   {
@@ -176,16 +200,31 @@
             </div>
           </div>
 
-          <div class="hero__scope" data-scope data-reveal>
-            <canvas
-              class="hero__scope-canvas"
-              data-scope-canvas
+          <div class="hero__scope scope" data-scope data-reveal>
+            <div
+              class="scope__frame"
+              data-scope-frame
+              tabindex="0"
               role="img"
-              aria-label="Animated oscilloscope waveform representing DeskPulse speaker vibration"
-            ></canvas>
-            <p class="hero__scope-readout" data-scope-readout aria-hidden="true">
-              FREQ 2.40 Hz&nbsp;&nbsp;AMP 0.62&nbsp;&nbsp;PHASE 1.73 rad
-            </p>
+              aria-label="Oscilloscope trace of the generated waveform."
+            >
+              <canvas class="scope__layer scope__grid" data-scope-grid aria-hidden="true"></canvas>
+              <canvas class="scope__layer scope__trace" data-scope-canvas aria-hidden="true"></canvas>
+              <p class="scope__readout" data-scope-readout aria-hidden="true">
+                FREQ 174.0 Hz&nbsp;&nbsp;&nbsp;AMP 0.62&nbsp;&nbsp;&nbsp;HARM 3&nbsp;&nbsp;&nbsp;PEAK —
+              </p>
+            </div>
+
+            <div class="scope__bar">
+              <button type="button" class="scope__mode" data-scope-mode>
+                <span class="scope__mode-key">MODE</span>
+                <span class="scope__mode-value" data-scope-mode-label>WAVEFORM</span>
+              </button>
+              <p class="scope__hint" aria-hidden="true">DRAG ↕ HARMONICS · ARROWS · M</p>
+              <p class="scope__state" data-scope-state aria-hidden="true">IDLE</p>
+            </div>
+
+            <p class="visually-hidden" data-scope-status role="status" aria-live="polite"></p>
           </div>
         </div>
       </section>
