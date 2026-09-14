@@ -2,6 +2,11 @@ import { initTheme } from "./theme.js";
 import { initScope } from "./scope.js";
 import { initReveal, initScrollProgress } from "./reveal.js";
 import { initDeskPulse, initProjectCards } from "./deskpulse.js";
+import { initResearchChart } from "./chart.js";
+import { initWorkbench } from "./workbench.js";
+import { initTerminal } from "./terminal.js";
+import { initPalette } from "./palette.js";
+import { initContact } from "./contact.js";
 
 function initHeaderScroll() {
   const header = document.querySelector("[data-site-header]");
@@ -121,3 +126,8 @@ initReveal();
 initScrollProgress();
 initDeskPulse();
 initProjectCards();
+initResearchChart();
+initWorkbench();
+initTerminal();
+initPalette();
+initContact();
