@@ -10,6 +10,7 @@ import { initPalette } from "./palette.js";
 import { initContact } from "./contact.js";
 import { initScrollSpy, initMagnetic, initScramble } from "./nav.js";
 import { initPerfHud } from "./perf.js";
+import { initEaster } from "./easter.js";
 import { whenNear } from "./util.js";
 
 function initHeaderScroll() {
@@ -142,6 +143,7 @@ initScramble();
 initScrollSpy();
 initMagnetic();
 initPerfHud();
+initEaster();
 registerServiceWorker();
 
 function registerServiceWorker() {

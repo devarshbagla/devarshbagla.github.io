@@ -35,7 +35,7 @@ const COMMANDS = [
   { id: "act-github", category: "Actions", label: "Open GitHub", keywords: "github", action: { type: "open", url: GITHUB } },
   { id: "act-linkedin", category: "Actions", label: "Open LinkedIn", keywords: "linkedin", action: { type: "open", url: LINKEDIN } },
   { id: "act-paper", category: "Actions", label: "Read the paper", keywords: "doi research churn", action: { type: "open", url: PAPER_DOI } },
-  { id: "act-terminal", category: "Actions", label: "Open terminal", keywords: "shell console konami", action: { type: "terminal" } },
+  { id: "act-terminal", category: "Actions", label: "Open terminal", keywords: "shell console backtick", action: { type: "terminal" } },
   { id: "act-perf", category: "Actions", label: "Toggle perf HUD", keywords: "fps memory performance hud", action: { type: "perf" } },
   { id: "act-print", category: "Actions", label: "Print / Save as PDF", keywords: "print pdf resume", action: { type: "print" } },
 ];

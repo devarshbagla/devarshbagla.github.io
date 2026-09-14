@@ -227,3 +227,37 @@ body.nav-open .rail {
 .perf-hud[hidden] {
   display: none;
 }
+
+/* —— Konami scope mode —— */
+.scope-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.scope-mode[hidden] {
+  display: none;
+}
+
+html.is-scope-mode {
+  --accent: #3adf7c;
+  --accent-dim: #1f7a45;
+}
+
+html.is-scope-mode body::before {
+  opacity: 0.25;
+}
+
+html.is-scope-mode .site {
+  position: relative;
+  z-index: 1;
+}
+
+@media print {
+  .scope-mode {
+    display: none !important;
+  }
+}

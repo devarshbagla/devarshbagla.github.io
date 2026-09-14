@@ -30,11 +30,26 @@
   </script>
   <style>
     .missing {
-      min-height: calc(100svh - var(--header-h));
+      position: relative;
+      isolation: isolate;
+      min-height: 100svh;
       display: grid;
       place-items: center;
       padding: var(--space-10) var(--gutter);
       text-align: center;
+    }
+    .missing__scope {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .missing__copy {
+      position: relative;
+      z-index: 1;
     }
     .missing__code {
       margin: 0 0 var(--space-4);
@@ -62,7 +77,8 @@
 </head>
 <body>
   <main class="missing">
-    <div>
+    <canvas class="missing__scope" data-missing-scope aria-hidden="true"></canvas>
+    <div class="missing__copy">
       <p class="missing__code">404</p>
       <h1 class="missing__title">This page does not exist.</h1>
       <p class="missing__body">
@@ -71,5 +87,6 @@
       <a class="btn btn--primary" href="./">Back home</a>
     </div>
   </main>
+  <script type="module" src="js/missing.js"></script>
 </body>
 </html>
