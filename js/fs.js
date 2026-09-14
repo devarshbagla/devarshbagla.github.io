@@ -121,6 +121,52 @@ Casio fx-CG50 Replica — PROTOTYPE — spec to app
 
 A working replica of a graphing calculator, rebuilt from its specification.
 `),
+    "rapidread.md": file(`
+RapidRead — IN DEVELOPMENT — RSVP, React Native, Expo, Android
+
+A speed reading app built on RSVP, rapid serial visual presentation, where
+words are flashed one at a time at a fixed point so your eyes never move.
+Eliminating saccades is most of what makes reading slow. Android first,
+because that is what I own. It is the one thing I am building in public.
+
+https://github.com/devarshbagla/Rapidread
+`),
+    "fluentflyout.md": file(`
+FluentFlyout — CONTRIBUTING — Open Source, C#, WPF, Windows 11
+
+An open-source media and volume flyout for Windows 11 built on Fluent 2
+design. I forked it to add scroll and gesture control for volume. First time
+working inside a codebase I did not write, to someone else's conventions,
+which is a completely different skill from starting from an empty folder.
+
+https://github.com/devarshbagla/FluentFlyout
+`),
+    "minecraft-progression-mod.md": file(`
+Minecraft Progression Mod — IN DEVELOPMENT — Java, Game Design, Systems
+
+Most players quit Minecraft in the first few hours because nothing tells them
+what to do next. A mod with a 331-entry adaptive goal system that reads your
+world seed and current progress and suggests the next thing worth doing, so
+the open world stops being paralysing.
+`),
+    "homelab.md": file(`
+Homelab — IN DEVELOPMENT — Ubuntu, Docker, Tailscale, Self-hosting
+
+A self-hosted stack in Kolkata: Ubuntu Server, Tailscale for mesh networking,
+Immich for photo backup, AdGuard Home for DNS filtering, Home Assistant,
+Portainer, Uptime Kuma. Built so I can reach my own data from another
+continent without paying anyone a subscription for the privilege.
+`),
+    "local-inference.md": file(`
+Local Inference — SHIPPED — LM Studio, Intel Arc, Quantisation
+
+Running language models locally on an Intel Arc integrated GPU, because I do
+not own a discrete card. Qwen 3.5 9B and Gemma 4 12B Instruct through LM
+Studio, with LM Link and the Locally iOS app so I can reach them from my phone.
+Currently adding SD.Next on the IPEX backend for local image generation on the
+same chip. The constraint is the interesting part: everyone doing this has a
+4090.
+`),
     "bees-in.md": file(`
 bees.in — SHIPPED — sole developer, 2 months, live in production
 
@@ -227,6 +273,86 @@ Private tutor, Computer Science — Independent, Jaipur
 Taught IGCSE Computer Science, focused on pseudocode and algorithmic problem
 solving. Took a student from no prior programming exposure to independently
 solving IGCSE pseudocode problems.
+`),
+  }),
+
+  before: dir({
+    "ib-diploma.md": file(`
+Two years, six subjects, three at Higher Level. Mine were Computer Science,
+Economics and Mathematics Analysis and Approaches AI, with English, Business
+Management and French ab initio at Standard Level.
+
+The Mathematics internal assessment was a used-car resale pricing model built
+with polynomial regression: collecting the data myself, choosing the degree,
+and then spending most of the write-up on why a higher-degree fit that looked
+better was actually worse. That was the first time overfitting stopped being
+a word in a textbook.
+
+Computer Science HL is what got me eight credits of advanced standing at
+Brandeis, so I started a year ahead of the standard sequence.
+
+HL COMPUTER SCIENCE · HL ECONOMICS · HL MATHEMATICS AI · 8 CREDITS OF ADVANCED STANDING
+`),
+    "scindia.md": file(`
+Three years at a residential boarding school in Gwalior, grades 8 to 10. It
+ran on assemblies, inter-school festivals and stage events, which is where
+almost everything else on this page comes from.
+
+I learned the harmonium there and kept at it for three years. Classical ragas,
+performed on stage for audiences of six hundred students across more than
+fifteen events, plus intra-school competitions I won a few of. I hold
+certificates in both harmonium and vocal performance. What it actually taught
+me was narrower than music: I kept failing one fast passage while playing the
+rest cleanly, and the fix was to stop drilling the passage and start listening
+to the whole piece. Most of my debugging works the same way now.
+
+I also placed second in English Debate and second in English Elocution. That
+is the only formal training I have in arguing a position out loud, and it has
+been more useful than it sounds.
+
+And I did woodworking every week for three years, which has no undo button. A
+palm-sized owl, a wooden fish, a nameplate, a tribal mask, and a Ganesha
+holding a modak in his trunk. Chisel, then the sander, then hours of
+sandpaper. It is where I learned what finished actually feels like.
+
+3 YEARS HARMONIUM · 15+ PERFORMANCES · 600+ AUDIENCE · 2ND, ENGLISH DEBATE · 2ND, ENGLISH ELOCUTION · 3 YEARS WOODWORKING
+`),
+    "finance.md": file(`
+Finance 101 through NSE Academy, the National Stock Exchange of India's
+education arm, run with Empirical Academy. Ten hours, self-paced: primary and
+secondary markets, IPO mechanics, how stock indices are actually constructed
+(market-cap weighted versus price weighted versus equally weighted), and the
+time value of money.
+
+The useful part was the NSE Smart simulator, where you build and hold a
+portfolio rather than answer questions about one. It is an introductory course,
+not a professional credential, but it is why the finance minor made sense.
+
+NSE ACADEMY · 10 HOURS · PORTFOLIO SIMULATION
+`),
+  }),
+
+  "off-the-clock": dir({
+    "swimming.md": file(`
+Calcutta Swimming Club, now the Brandeis Swim Club. The only thing I do that
+has nothing to do with a screen.
+`),
+    "games.md": file(`
+Call of Duty Mobile, ranked multiplayer, top 2% globally. Also Minecraft,
+Valorant, Frostpunk, Overcooked 2, Clash Royale and actual chess. The range is
+deliberate: competitive FPS, survival strategy, sandbox, forced co-op and
+real-time strategy all break in different ways. I am taking Designing and
+Analyzing Games this semester, which is the first time anyone has asked me to
+write down why.
+`),
+    "drawing.md": file(`
+Observational sketching, drawing objects from life, plus light digital work.
+It is the front end of the loop in the Workbench section: if you can record a
+form accurately you can model it, and if you can model it you can print it.
+`),
+    "languages.md": file(`
+English, Hindi and Bengali fluently. French badly but improving. Kolkata and
+Jaipur growing up, Waltham now.
 `),
   }),
 

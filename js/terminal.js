@@ -20,6 +20,7 @@ import {
 } from "./fs.js";
 import { prefersReducedMotion, store } from "./util.js";
 import { getTheme, setTheme } from "./theme.js";
+import { triggerDeskPulse } from "./deskpulse.js";
 
 const HISTORY_KEY = "terminal:history";
 const HISTORY_MAX = 120;
@@ -49,6 +50,9 @@ const COMMANDS = [
   ["open", "open a url or shortcut in a new tab"],
   ["theme", "theme dark | theme light"],
   ["credits", "who actually wrote this site"],
+  ["harmonium", "three years of ragas"],
+  ["play", "fire the DeskPulse demo"],
+  ["games", "what I play, and the ranking"],
   ["clear", "clear the screen"],
   ["help", "this list"],
   ["sudo", "you know"],
@@ -63,6 +67,8 @@ const ALIASES = {
   skills: "cat /about/stack.md",
   contact: "cat /contact/email.txt",
   about: "cat /about/bio.md",
+  before: "ls /before",
+  clock: "ls /off-the-clock",
   ll: "ls",
   dir: "ls",
   "?": "help",
@@ -440,6 +446,37 @@ export function initTerminal(root = document) {
 
       case "credits":
         print(CREDITS);
+        break;
+
+      case "harmonium":
+        print(
+          [
+            "Three years of classical ragas at The Scindia School.",
+            "Performed on stage for audiences of six hundred students across more than fifteen events.",
+            "Certificates in both harmonium and vocal performance.",
+            "The useful lesson: stop drilling the broken passage and listen to the whole piece.",
+            "Most of my debugging works the same way now.",
+            "",
+            "cat /before/scindia.md",
+          ].join("\n")
+        );
+        break;
+
+      case "play":
+        print("Firing DeskPulse. Laptop speakers, volume at 100%.");
+        triggerDeskPulse();
+        break;
+
+      case "games":
+        print(
+          [
+            "Call of Duty Mobile — ranked multiplayer, top 2% globally.",
+            "Also Minecraft, Valorant, Frostpunk, Overcooked 2, Clash Royale and actual chess.",
+            "The range is deliberate: competitive FPS, survival strategy, sandbox, forced co-op and real-time strategy all break in different ways.",
+            "",
+            "cat /off-the-clock/games.md",
+          ].join("\n")
+        );
         break;
 
       case "clear":
