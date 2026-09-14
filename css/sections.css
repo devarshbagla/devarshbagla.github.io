@@ -369,6 +369,113 @@
   }
 }
 
+/* —— Now —— */
+.now__updated {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin: calc(var(--space-6) * -1) 0 var(--space-6);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: var(--ink-muted);
+}
+
+.now__updated-key {
+  color: var(--accent);
+}
+
+.now__prose {
+  max-width: 62ch;
+  font-size: var(--step-0);
+  line-height: 1.7;
+  color: var(--ink-muted);
+}
+
+/* —— Stack —— */
+.stack__lede {
+  max-width: 48ch;
+  margin: 0 0 var(--space-7);
+  color: var(--ink-muted);
+  line-height: 1.65;
+}
+
+.stack__groups {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.stack__group-title {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--ink-muted);
+}
+
+.stack__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.stack__chips li {
+  position: relative;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  cursor: default;
+}
+
+.stack__chips li:hover,
+.stack__chips li:focus-visible {
+  border-color: var(--accent-dim);
+  color: var(--accent);
+}
+
+.stack__chips em {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 0.4rem);
+  z-index: 3;
+  width: max-content;
+  max-width: min(22rem, 70vw);
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-style: normal;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  line-height: 1.45;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition:
+    opacity 160ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+.stack__chips li:hover em,
+.stack__chips li:focus-visible em {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack__chips em {
+    transition: none;
+  }
+}
+
 /* —— Work —— */
 .work__list {
   display: flex;

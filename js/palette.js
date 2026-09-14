@@ -11,11 +11,13 @@ const GITHUB = "https://github.com/devarshbagla";
 const LINKEDIN = "https://www.linkedin.com/in/devarshbagla";
 
 const COMMANDS = [
+  { id: "sec-now", category: "Sections", label: "Now", keywords: "now cad lm studio gpu", action: { type: "scroll", target: "#now" } },
   { id: "sec-work", category: "Sections", label: "Work", keywords: "work experience bees", action: { type: "scroll", target: "#work" } },
   { id: "sec-projects", category: "Sections", label: "Projects", keywords: "projects", action: { type: "scroll", target: "#projects" } },
   { id: "sec-research", category: "Sections", label: "Research", keywords: "research paper churn", action: { type: "scroll", target: "#research" } },
   { id: "sec-teaching", category: "Sections", label: "Teaching", keywords: "teaching community", action: { type: "scroll", target: "#teaching" } },
   { id: "sec-workbench", category: "Sections", label: "The Workbench", keywords: "workbench loop sketch cad", action: { type: "scroll", target: "#workbench" } },
+  { id: "sec-stack", category: "Sections", label: "Stack", keywords: "stack languages python tools", action: { type: "scroll", target: "#stack" } },
   { id: "sec-contact", category: "Sections", label: "Contact", keywords: "contact email", action: { type: "scroll", target: "#contact" } },
 
   { id: "proj-deskpulse", category: "Projects", label: "DeskPulse", keywords: "haptic audio", action: { type: "scroll", target: "#projects" } },

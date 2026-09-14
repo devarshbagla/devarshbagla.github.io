@@ -119,11 +119,13 @@
         <div class="site-header__actions">
           <nav class="site-nav" data-site-nav aria-label="Primary">
             <ul class="site-nav__list" id="primary-nav-list">
+              <li><a class="site-nav__link" href="#now">Now</a></li>
               <li><a class="site-nav__link" href="#work">Work</a></li>
               <li><a class="site-nav__link" href="#projects">Projects</a></li>
               <li><a class="site-nav__link" href="#research">Research</a></li>
               <li><a class="site-nav__link" href="#teaching">Teaching</a></li>
               <li><a class="site-nav__link" href="#workbench">Workbench</a></li>
+              <li><a class="site-nav__link" href="#stack">Stack</a></li>
               <li><a class="site-nav__link" href="#contact">Contact</a></li>
             </ul>
           </nav>
@@ -294,6 +296,27 @@
                 </div>
               </dl>
             </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- Update the LAST UPDATED stamp (and the copy) whenever this paragraph changes. -->
+      <section id="now" class="section now" aria-labelledby="now-heading">
+        <div class="container">
+          <p class="section__label" id="now-heading" data-reveal>08 / NOW</p>
+          <p class="now__updated" data-reveal>
+            <span class="now__updated-key">LAST UPDATED</span>
+            <time datetime="2026-09-14">14 SEP 2026</time>
+          </p>
+          <div class="now__prose" data-reveal>
+            <p>
+              Learning CAD so I can design the parts I print instead of downloading them.
+              Running local language models on integrated graphics because I do not own a
+              discrete GPU: Qwen and Gemma through LM Studio on an Intel Arc iGPU, with
+              remote access from my phone. Setting up local image generation on the same
+              card. Reading about how far you can push consumer hardware before it stops
+              being worth it.
+            </p>
           </div>
         </div>
       </section>
@@ -894,6 +917,74 @@
               Hover, drag or focus a node. Enter opens its detail.
             </p>
             <div class="wb-detail" data-workbench-detail hidden></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stack" class="section stack" aria-labelledby="stack-heading">
+        <div class="container">
+          <p class="section__label" id="stack-heading" data-reveal>09 / STACK</p>
+          <p class="stack__lede" data-reveal>
+            What I actually use, grouped honestly. Hover or focus a chip for depth.
+            Nothing here is claimed beyond what I have done with it.
+          </p>
+
+          <div class="stack__groups">
+            <div class="stack__group" data-reveal>
+              <h3 class="stack__group-title">LANGUAGES</h3>
+              <ul class="stack__chips">
+                <li tabindex="0"><span>Python</span><em>primary language, research pipeline and scripting</em></li>
+                <li tabindex="0"><span>Java</span><em>in progress, first semester</em></li>
+                <li tabindex="0"><span>JavaScript</span><em>this site and browser tools, no framework</em></li>
+                <li tabindex="0"><span>HTML/CSS</span><em>bees.in and this site, written by hand</em></li>
+              </ul>
+            </div>
+            <div class="stack__group" data-reveal>
+              <h3 class="stack__group-title">AI TOOLING</h3>
+              <ul class="stack__chips">
+                <li tabindex="0"><span>Claude Code</span><em>daily driver for long agent sessions</em></li>
+                <li tabindex="0"><span>Cursor</span><em>where this site is being written</em></li>
+                <li tabindex="0"><span>Claude Projects</span><em>standing context for papers and briefs</em></li>
+                <li tabindex="0"><span>Antigravity</span><em>tried, not a daily tool</em></li>
+                <li tabindex="0"><span>LM Studio</span><em>local Qwen and Gemma on an Intel Arc iGPU</em></li>
+              </ul>
+            </div>
+            <div class="stack__group" data-reveal>
+              <h3 class="stack__group-title">ML AND DATA</h3>
+              <ul class="stack__chips">
+                <li tabindex="0"><span>WEKA</span><em>full churn pipeline, the published paper</em></li>
+                <li tabindex="0"><span>SMOTE</span><em>class imbalance on the 64,374-record set</em></li>
+                <li tabindex="0"><span>grid search</span><em>hyperparameters under ten-fold CV</em></li>
+                <li tabindex="0"><span>k-fold CV</span><em>ten-fold, same evaluation</em></li>
+              </ul>
+            </div>
+            <div class="stack__group" data-reveal>
+              <h3 class="stack__group-title">WEB</h3>
+              <ul class="stack__chips">
+                <li tabindex="0"><span>Vercel</span><em>From Dust to Zenith, deployed and DNS-wired</em></li>
+                <li tabindex="0"><span>DNS</span><em>bees.in and fromdusttozenith.in</em></li>
+                <li tabindex="0"><span>browser extensions</span><em>SnapBack, still in development</em></li>
+              </ul>
+            </div>
+            <div class="stack__group" data-reveal>
+              <h3 class="stack__group-title">HARDWARE</h3>
+              <ul class="stack__chips">
+                <li tabindex="0"><span>ESP32</span><em>anything that needs to light up, move or sense</em></li>
+                <li tabindex="0"><span>WLED</span><em>same boards, lighting firmware</em></li>
+                <li tabindex="0"><span>soldering</span><em>repair under time pressure more than assembly</em></li>
+                <li tabindex="0"><span>FDM 3D printing</span><em>other people's models, for now</em></li>
+                <li tabindex="0"><span>Prusa Mini+</span><em>certified at the Brandeis MakerLab</em></li>
+                <li tabindex="0"><span>AV systems</span><em>three years, thirty-plus events</em></li>
+              </ul>
+            </div>
+            <div class="stack__group" data-reveal>
+              <h3 class="stack__group-title">SYSTEMS</h3>
+              <ul class="stack__chips">
+                <li tabindex="0"><span>Ubuntu Server</span><em>home lab, the box that runs the models</em></li>
+                <li tabindex="0"><span>Docker</span><em>local services, not a production fleet</em></li>
+                <li tabindex="0"><span>Tailscale</span><em>phone access to the iGPU box</em></li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>

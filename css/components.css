@@ -80,6 +80,12 @@
   background: color-mix(in srgb, var(--surface-2) 80%, transparent);
 }
 
+@media (max-width: 1180px) {
+  .site-nav__link {
+    padding-inline: var(--space-2);
+  }
+}
+
 .icon-btn {
   display: inline-flex;
   align-items: center;
