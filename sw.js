@@ -25,6 +25,7 @@ const PRECACHE = [
   "./css/sections.css",
   "./css/instrument.css",
   "./css/system.css",
+  "./css/print.css",
   "./js/main.js",
   "./js/util.js",
   "./js/theme.js",

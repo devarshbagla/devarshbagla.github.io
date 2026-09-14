@@ -17,11 +17,15 @@
   <meta property="og:description" content="Computer Science and Economics at Brandeis. I build small tools for problems that annoy me, and teach other people to do the same.">
   <meta property="og:site_name" content="Devarsh Bagla">
   <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://devarshbagla.github.io/assets/og-image.svg">
+  <meta property="og:image:type" content="image/svg+xml">
+  <meta property="og:image:alt" content="Amber waveform on black, Devarsh Bagla, I build small tools for problems that annoy me.">
 
   <!-- Twitter -->
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Devarsh Bagla — builds things">
   <meta name="twitter:description" content="Computer Science and Economics at Brandeis. I build small tools for problems that annoy me, and teach other people to do the same.">
+  <meta name="twitter:image" content="https://devarshbagla.github.io/assets/og-image.svg">
 
   <!-- Fonts: preconnect + preload, then stylesheet -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,6 +43,7 @@
   <link rel="stylesheet" href="css/sections.css">
   <link rel="stylesheet" href="css/instrument.css">
   <link rel="stylesheet" href="css/system.css">
+  <link rel="stylesheet" href="css/print.css" media="print">
 
   <!-- Prevent flash of wrong theme before CSS/JS hydrate -->
   <script>
@@ -88,23 +93,108 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Devarsh Bagla",
-    "url": "https://devarshbagla.github.io",
-    "email": "mailto:devarshbagla@gmail.com",
-    "affiliation": {
-      "@type": "CollegeOrUniversity",
-      "name": "Brandeis University"
-    },
-    "knowsAbout": [
-      "machine learning",
-      "web development",
-      "embedded systems",
-      "3D printing"
-    ],
-    "sameAs": [
-      "https://github.com/devarshbagla",
-      "https://www.linkedin.com/in/devarshbagla"
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://devarshbagla.github.io/#person",
+        "name": "Devarsh Bagla",
+        "url": "https://devarshbagla.github.io",
+        "email": "mailto:devarshbagla@gmail.com",
+        "affiliation": {
+          "@type": "CollegeOrUniversity",
+          "name": "Brandeis University"
+        },
+        "knowsAbout": [
+          "machine learning",
+          "web development",
+          "embedded systems",
+          "3D printing"
+        ],
+        "sameAs": [
+          "https://github.com/devarshbagla",
+          "https://www.linkedin.com/in/devarshbagla"
+        ]
+      },
+      {
+        "@type": "ScholarlyArticle",
+        "@id": "https://dx.doi.org/10.70729/SE251005174007",
+        "name": "Deep Learning Approaches for Churn Prediction: An Empirical Evaluation on Real-World Business Datasets",
+        "author": { "@id": "https://devarshbagla.github.io/#person" },
+        "datePublished": "2025-10",
+        "identifier": "https://doi.org/10.70729/SE251005174007",
+        "url": "https://www.ijser.in/archives/v13i10/SE251005174007.pdf",
+        "isPartOf": {
+          "@type": "Periodical",
+          "name": "International Journal of Scientific Engineering and Research",
+          "volumeNumber": "13",
+          "issueNumber": "10"
+        }
+      },
+      {
+        "@type": "CreativeWork",
+        "name": "DeskPulse",
+        "author": { "@id": "https://devarshbagla.github.io/#person" },
+        "description": "Bass-heavy speaker bursts that vibrate a laptop chassis in place of a haptic motor.",
+        "creativeWorkStatus": "Prototype"
+      },
+      {
+        "@type": "CreativeWork",
+        "name": "LIZI",
+        "author": { "@id": "https://devarshbagla.github.io/#person" },
+        "description": "A voice assistant for a laptop that routes hard questions to local language models.",
+        "creativeWorkStatus": "Incomplete"
+      },
+      {
+        "@type": "CreativeWork",
+        "name": "SnapBack",
+        "author": { "@id": "https://devarshbagla.github.io/#person" },
+        "description": "A Chrome extension that snoozes tab groups and restores them on a context trigger.",
+        "creativeWorkStatus": "Incomplete"
+      },
+      {
+        "@type": "CreativeWork",
+        "name": "Desktop Task Manager",
+        "author": { "@id": "https://devarshbagla.github.io/#person" },
+        "description": "A task list drawn into the Windows desktop layer using WorkerW.",
+        "creativeWorkStatus": "Incomplete"
+      },
+      {
+        "@type": "CreativeWork",
+        "name": "Agentic Workflow",
+        "author": { "@id": "https://devarshbagla.github.io/#person" },
+        "description": "A three-file method for keeping an agent session recoverable overnight.",
+        "creativeWorkStatus": "Published"
+      },
+      {
+        "@type": "CreativeWork",
+        "name": "Chess Coach",
+        "author": { "@id": "https://devarshbagla.github.io/#person" },
+        "description": "A browser chess coach with IndexedDB persistence and a worker-backed engine.",
+        "creativeWorkStatus": "Incomplete"
+      },
+      {
+        "@type": "CreativeWork",
+        "name": "From Dust to Zenith",
+        "author": { "@id": "https://devarshbagla.github.io/#person" },
+        "url": "https://fromdusttozenith.in",
+        "description": "An editorial publication site deployed on Vercel.",
+        "creativeWorkStatus": "Published"
+      },
+      {
+        "@type": "CreativeWork",
+        "name": "Casio fx-CG50 Replica",
+        "author": { "@id": "https://devarshbagla.github.io/#person" },
+        "description": "A working replica of a graphing calculator rebuilt from its specification.",
+        "creativeWorkStatus": "Prototype"
+      },
+      {
+        "@type": "CreativeWork",
+        "name": "bees.in",
+        "author": { "@id": "https://devarshbagla.github.io/#person" },
+        "url": "https://bees.in",
+        "description": "The first website for BEES Network Ltd, shipped end to end in two months.",
+        "creativeWorkStatus": "Published"
+      }
     ]
   }
   </script>

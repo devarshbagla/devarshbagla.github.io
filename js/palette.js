@@ -37,6 +37,7 @@ const COMMANDS = [
   { id: "act-paper", category: "Actions", label: "Read the paper", keywords: "doi research churn", action: { type: "open", url: PAPER_DOI } },
   { id: "act-terminal", category: "Actions", label: "Open terminal", keywords: "shell console konami", action: { type: "terminal" } },
   { id: "act-perf", category: "Actions", label: "Toggle perf HUD", keywords: "fps memory performance hud", action: { type: "perf" } },
+  { id: "act-print", category: "Actions", label: "Print / Save as PDF", keywords: "print pdf resume", action: { type: "print" } },
 ];
 
 function fuzzyScore(query, text) {
@@ -104,6 +105,9 @@ function runAction(action) {
       break;
     case "perf":
       togglePerfHud();
+      break;
+    case "print":
+      window.print();
       break;
     default:
       break;

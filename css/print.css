@@ -1,0 +1,142 @@
+/* Print / Save as PDF — a single-column resume. Hidden from screen. */
+
+@media print {
+  :root,
+  [data-theme="dark"],
+  [data-theme="light"] {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f7f3ec;
+    --ink: #16130f;
+    --ink-muted: #5a544c;
+    --line: #d6cfc3;
+    --accent: #b8501f;
+    --accent-dim: #8a4423;
+    --cool: #4a7a9b;
+    --ok: #3d8a62;
+    --warn: #a87a20;
+  }
+
+  @page {
+    margin: 14mm 14mm 16mm;
+  }
+
+  html {
+    font-size: 11pt;
+  }
+
+  body {
+    background: #fff;
+    color: #16130f;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body::before,
+  .scroll-progress,
+  .site-header,
+  .rail,
+  .palette,
+  .palette-hint,
+  .terminal,
+  .perf-hud,
+  .skip-link,
+  .hero__scope,
+  .scope,
+  .deskpulse,
+  .deskpulse__canvas,
+  canvas,
+  .workbench__stage,
+  .workbench__caption,
+  .wb-detail,
+  .research-chart,
+  .churn,
+  .nav-toggle,
+  .theme-toggle {
+    display: none !important;
+  }
+
+  .site {
+    display: block;
+  }
+
+  .container {
+    width: 100%;
+    max-width: none;
+  }
+
+  .section,
+  .hero {
+    padding-block: 10mm;
+    min-height: 0;
+    break-inside: avoid;
+  }
+
+  .hero {
+    padding-top: 0;
+  }
+
+  .hero__grid,
+  .about__grid,
+  .projects__grid,
+  .contact__cards,
+  .stack__groups {
+    display: block;
+  }
+
+  .hero__title {
+    font-size: 22pt;
+  }
+
+  .hero__lead,
+  .about__prose,
+  .now__prose {
+    max-width: none;
+    color: #16130f;
+  }
+
+  a[href^="http"]::after,
+  a[href^="mailto:"]::after {
+    content: " (" attr(href) ")";
+    font-family: var(--font-mono);
+    font-size: 8pt;
+    color: #5a544c;
+    word-break: break-all;
+  }
+
+  .work-card,
+  .project-card,
+  .timeline__card,
+  .contact-card,
+  .research-paper,
+  .research-note {
+    break-inside: avoid;
+    box-shadow: none;
+    transform: none;
+    border-color: #d6cfc3;
+    background: #fff;
+  }
+
+  .timeline::before,
+  .timeline__node {
+    display: none;
+  }
+
+  .timeline__item,
+  .timeline__card,
+  .timeline__item:nth-child(even) .timeline__card {
+    display: block;
+    width: 100%;
+    grid-column: auto;
+  }
+
+  #contact,
+  #stack {
+    break-before: page;
+  }
+
+  .site-footer {
+    border-top: 1px solid #d6cfc3;
+  }
+}
