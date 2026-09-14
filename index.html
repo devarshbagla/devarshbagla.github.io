@@ -345,7 +345,7 @@
           <p class="section__label" id="projects-heading" data-reveal>03 / PROJECTS</p>
           <div class="projects__grid">
 
-            <article class="project-card" data-reveal tabindex="0" data-project-card>
+            <article class="project-card" id="project-deskpulse" data-reveal tabindex="0" data-project-card>
               <div class="project-card__top">
                 <h2 class="project-card__title">DeskPulse</h2>
                 <span class="status status--prototype">PROTOTYPE</span>
@@ -474,7 +474,7 @@
               </div>
             </article>
 
-            <article class="project-card" data-reveal tabindex="0" data-project-card>
+            <article class="project-card" id="project-lizi" data-reveal tabindex="0" data-project-card>
               <div class="project-card__top">
                 <h2 class="project-card__title">LIZI</h2>
                 <span class="status status--dev">IN DEVELOPMENT</span>
@@ -493,7 +493,7 @@
               </p>
             </article>
 
-            <article class="project-card" data-reveal tabindex="0" data-project-card>
+            <article class="project-card" id="project-snapback" data-reveal tabindex="0" data-project-card>
               <div class="project-card__top">
                 <h2 class="project-card__title">SnapBack</h2>
                 <span class="status status--dev">IN DEVELOPMENT</span>
@@ -510,7 +510,7 @@
               </p>
             </article>
 
-            <article class="project-card" data-reveal tabindex="0" data-project-card>
+            <article class="project-card" id="project-desktop-task-manager" data-reveal tabindex="0" data-project-card>
               <div class="project-card__top">
                 <h2 class="project-card__title">Desktop Task Manager</h2>
                 <span class="status status--dev">IN DEVELOPMENT</span>
@@ -527,7 +527,7 @@
               </p>
             </article>
 
-            <article class="project-card" data-reveal tabindex="0" data-project-card>
+            <article class="project-card" id="project-agentic-workflow" data-reveal tabindex="0" data-project-card>
               <div class="project-card__top">
                 <h2 class="project-card__title">Agentic Workflow</h2>
                 <span class="status status--shipped">SHIPPED</span>
@@ -548,7 +548,7 @@
               </p>
             </article>
 
-            <article class="project-card" data-reveal tabindex="0" data-project-card>
+            <article class="project-card" id="project-chess-coach" data-reveal tabindex="0" data-project-card>
               <div class="project-card__top">
                 <h2 class="project-card__title">Chess Coach</h2>
                 <span class="status status--dev">IN DEVELOPMENT</span>
@@ -565,7 +565,7 @@
               </p>
             </article>
 
-            <article class="project-card" data-reveal tabindex="0" data-project-card>
+            <article class="project-card" id="project-from-dust-to-zenith" data-reveal tabindex="0" data-project-card>
               <div class="project-card__top">
                 <h2 class="project-card__title">From Dust to Zenith</h2>
                 <span class="status status--shipped">SHIPPED</span>
@@ -587,7 +587,7 @@
               >fromdusttozenith.in</a>
             </article>
 
-            <article class="project-card" data-reveal tabindex="0" data-project-card>
+            <article class="project-card" id="project-casio-fx-cg50" data-reveal tabindex="0" data-project-card>
               <div class="project-card__top">
                 <h2 class="project-card__title">Casio fx-CG50 Replica</h2>
                 <span class="status status--prototype">PROTOTYPE</span>
@@ -891,8 +891,9 @@
               <div class="workbench__svg-host" data-workbench-svg></div>
             </div>
             <p class="workbench__caption" data-workbench-caption>
-              Hover or focus a node to read the caption.
+              Hover, drag or focus a node. Enter opens its detail.
             </p>
+            <div class="wb-detail" data-workbench-detail hidden></div>
           </div>
         </div>
       </section>
