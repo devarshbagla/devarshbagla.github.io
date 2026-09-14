@@ -31,6 +31,11 @@ const COMMANDS = [
   { id: "proj-chess", category: "Projects", label: "Chess Coach", keywords: "chess", action: { type: "scroll", target: "#projects" } },
   { id: "proj-dust", category: "Projects", label: "From Dust to Zenith", keywords: "editorial vercel", action: { type: "scroll", target: "#projects" } },
   { id: "proj-casio", category: "Projects", label: "Casio fx-CG50 Replica", keywords: "calculator", action: { type: "scroll", target: "#projects" } },
+  { id: "proj-rapidread", category: "Projects", label: "RapidRead", keywords: "rsvp reading android expo", action: { type: "scroll", target: "#project-rapidread" } },
+  { id: "proj-fluent", category: "Projects", label: "FluentFlyout", keywords: "windows volume wpf", action: { type: "scroll", target: "#project-fluentflyout" } },
+  { id: "proj-minecraft", category: "Projects", label: "Minecraft Progression Mod", keywords: "minecraft java goals", action: { type: "scroll", target: "#project-minecraft-mod" } },
+  { id: "proj-homelab", category: "Projects", label: "Homelab", keywords: "ubuntu docker tailscale", action: { type: "scroll", target: "#project-homelab" } },
+  { id: "proj-inference", category: "Projects", label: "Local Inference", keywords: "lm studio arc qwen gemma", action: { type: "scroll", target: "#project-local-inference" } },
 
   { id: "act-theme", category: "Actions", label: "Toggle theme", keywords: "dark light mode", action: { type: "theme" } },
   { id: "act-email", category: "Actions", label: "Copy email", keywords: "email clipboard", action: { type: "copy-email" } },

@@ -631,6 +631,10 @@
   color: var(--ink-muted);
 }
 
+.status--contrib {
+  color: var(--cool);
+}
+
 .project-card__tags {
   display: flex;
   flex-wrap: wrap;
