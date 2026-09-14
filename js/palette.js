@@ -21,6 +21,7 @@ const COMMANDS = [
   { id: "sec-before", category: "Sections", label: "Before this", keywords: "ib diploma scindia harmonium finance nse", action: { type: "scroll", target: "#before" } },
   { id: "sec-workbench", category: "Sections", label: "The Workbench", keywords: "workbench loop sketch cad", action: { type: "scroll", target: "#workbench" } },
   { id: "sec-stack", category: "Sections", label: "Stack", keywords: "stack languages python tools", action: { type: "scroll", target: "#stack" } },
+  { id: "sec-off", category: "Sections", label: "Off the clock", keywords: "swimming games drawing languages", action: { type: "scroll", target: "#off-clock" } },
   { id: "sec-contact", category: "Sections", label: "Contact", keywords: "contact email", action: { type: "scroll", target: "#contact" } },
 
   { id: "proj-deskpulse", category: "Projects", label: "DeskPulse", keywords: "haptic audio", action: { type: "scroll", target: "#projects" } },

@@ -220,6 +220,7 @@
               <li><a class="site-nav__link" href="#before">Before</a></li>
               <li><a class="site-nav__link" href="#workbench">Workbench</a></li>
               <li><a class="site-nav__link" href="#stack">Stack</a></li>
+              <li><a class="site-nav__link" href="#off-clock">Off the clock</a></li>
               <li><a class="site-nav__link" href="#contact">Contact</a></li>
             </ul>
           </nav>
@@ -258,7 +259,8 @@
     <!--
       Section numbers must stay sequential in DOM order.
       Current list: 01 ABOUT, 02 NOW, 03 WORK, 04 PROJECTS, 05 RESEARCH,
-      06 TEACHING, 07 BEFORE THIS, 08 WORKBENCH, 09 STACK, 10 CONTACT.
+      06 TEACHING, 07 BEFORE THIS, 08 WORKBENCH, 09 STACK, 10 OFF THE CLOCK,
+      11 CONTACT.
       Inserted sections take the next number in place and everything after
       them shifts so the rendered labels never scramble again.
     -->
@@ -1302,9 +1304,50 @@
         </div>
       </section>
 
+      <section id="off-clock" class="section off-clock" aria-labelledby="off-clock-heading">
+        <div class="container">
+          <p class="section__label" id="off-clock-heading" data-reveal>10 / OFF THE CLOCK</p>
+          <div class="off-clock__grid" data-reveal>
+            <div class="off-clock__item">
+              <h3 class="off-clock__label">SWIMMING</h3>
+              <p>
+                Calcutta Swimming Club, now the Brandeis Swim Club. The only thing I do that
+                has nothing to do with a screen.
+              </p>
+            </div>
+            <div class="off-clock__item">
+              <h3 class="off-clock__label">GAMES</h3>
+              <p>
+                Call of Duty Mobile, ranked multiplayer, top 2% globally. Also Minecraft,
+                Valorant, Frostpunk, Overcooked 2, Clash Royale and actual chess. The range is
+                deliberate: competitive FPS, survival strategy, sandbox, forced co-op and
+                real-time strategy all break in different ways. I am taking Designing and
+                Analyzing Games this semester, which is the first time anyone has asked me to
+                write down why.
+              </p>
+            </div>
+            <div class="off-clock__item">
+              <h3 class="off-clock__label">DRAWING</h3>
+              <p>
+                Observational sketching, drawing objects from life, plus light digital work.
+                It is the front end of the loop in the Workbench section: if you can record a
+                form accurately you can model it, and if you can model it you can print it.
+              </p>
+            </div>
+            <div class="off-clock__item">
+              <h3 class="off-clock__label">LANGUAGES</h3>
+              <p>
+                English, Hindi and Bengali fluently. French badly but improving. Kolkata and
+                Jaipur growing up, Waltham now.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="contact" class="section contact" aria-labelledby="contact-heading">
         <div class="container">
-          <p class="section__label" id="contact-heading" data-reveal>10 / CONTACT</p>
+          <p class="section__label" id="contact-heading" data-reveal>11 / CONTACT</p>
           <div class="contact__inner" data-reveal>
             <h2 class="contact__title">
               Building something, teaching something, or arguing about something?
