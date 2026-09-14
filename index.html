@@ -372,6 +372,13 @@
                   </button>
                   <button
                     type="button"
+                    class="btn btn--ghost deskpulse__tune"
+                    data-deskpulse-toggle
+                    aria-expanded="false"
+                    aria-controls="deskpulse-lab"
+                  >Tune it</button>
+                  <button
+                    type="button"
                     class="icon-btn deskpulse__mute"
                     data-deskpulse-mute
                     aria-pressed="false"
@@ -389,10 +396,80 @@
                     </svg>
                   </button>
                 </div>
-                <canvas class="deskpulse__canvas" data-deskpulse-canvas width="320" height="48" aria-hidden="true"></canvas>
-                <p class="deskpulse__note" data-deskpulse-note>
-                  Best on a laptop with the volume up. You should feel it more than hear it.
+
+                <canvas class="deskpulse__canvas" data-deskpulse-canvas aria-hidden="true"></canvas>
+
+                <p class="deskpulse__warn">
+                  Laptop speakers, volume up. Headphones will not work.
                 </p>
+                <p class="deskpulse__note" data-deskpulse-note>
+                  There is no way for a web page to tell what you are listening on, so
+                  this is a standing warning rather than a detection.
+                </p>
+
+                <div class="dsp" id="deskpulse-lab" data-deskpulse-lab hidden>
+                  <div class="dsp__block">
+                    <p class="dsp__legend" id="dsp-presets-label">Presets</p>
+                    <div class="dsp__chips" role="group" aria-labelledby="dsp-presets-label">
+                      <button type="button" class="chip" data-dsp-preset="notification" aria-pressed="false">NOTIFICATION</button>
+                      <button type="button" class="chip" data-dsp-preset="call" aria-pressed="false">INCOMING CALL</button>
+                      <button type="button" class="chip" data-dsp-preset="email" aria-pressed="false">NEW EMAIL</button>
+                      <button type="button" class="chip" data-dsp-preset="error" aria-pressed="false">ERROR</button>
+                      <button type="button" class="chip" data-dsp-preset="heartbeat" aria-pressed="false">HEARTBEAT</button>
+                    </div>
+                  </div>
+
+                  <div class="dsp__block">
+                    <p class="dsp__legend" id="dsp-params-label">Parameters</p>
+                    <div class="dsp__grid" role="group" aria-labelledby="dsp-params-label">
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="dp-freq">BASE FREQ</label>
+                        <input class="dsp__range" id="dp-freq" type="range" min="30" max="120" step="1" value="55" data-dsp-param="freq">
+                        <output class="dsp__value" for="dp-freq" data-dsp-out="freq">55 Hz</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="dp-bursts">BURSTS</label>
+                        <input class="dsp__range" id="dp-bursts" type="range" min="1" max="5" step="1" value="3" data-dsp-param="bursts">
+                        <output class="dsp__value" for="dp-bursts" data-dsp-out="bursts">3</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="dp-spacing">SPACING</label>
+                        <input class="dsp__range" id="dp-spacing" type="range" min="40" max="300" step="5" value="90" data-dsp-param="spacing">
+                        <output class="dsp__value" for="dp-spacing" data-dsp-out="spacing">90 ms</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="dp-attack">ATTACK</label>
+                        <input class="dsp__range" id="dp-attack" type="range" min="2" max="40" step="1" value="8" data-dsp-param="attack">
+                        <output class="dsp__value" for="dp-attack" data-dsp-out="attack">8 ms</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="dp-decay">DECAY</label>
+                        <input class="dsp__range" id="dp-decay" type="range" min="50" max="400" step="10" value="180" data-dsp-param="decay">
+                        <output class="dsp__value" for="dp-decay" data-dsp-out="decay">180 ms</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="dp-cutoff">LOWPASS</label>
+                        <input class="dsp__range" id="dp-cutoff" type="range" min="60" max="300" step="5" value="120" data-dsp-param="cutoff">
+                        <output class="dsp__value" for="dp-cutoff" data-dsp-out="cutoff">120 Hz</output>
+                      </div>
+                    </div>
+                  </div>
+
+                  <details class="dsp__why">
+                    <summary>Why this works</summary>
+                    <p>
+                      To reproduce a low frequency at the same loudness as a high one, a
+                      voice coil has to travel much further. Below about 60 Hz a laptop's
+                      driver is too small to move enough air to be heard properly, so most
+                      of that energy goes into physically shaking the driver assembly and,
+                      through its mounting, the chassis your hands are resting on. DeskPulse
+                      leans on that failure: short, steep, low-frequency bursts behind a
+                      lowpass filter, tuned so the desk moves rather than the air.
+                    </p>
+                  </details>
+
+                  <p class="visually-hidden" data-dsp-status role="status" aria-live="polite"></p>
+                </div>
               </div>
             </article>
 

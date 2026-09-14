@@ -618,19 +618,42 @@
 .deskpulse__canvas {
   display: block;
   width: 100%;
-  height: 48px;
+  height: 68px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--bg) 70%, transparent);
 }
 
-.deskpulse__note {
+.deskpulse__note,
+.deskpulse__warn {
   margin: 0;
   font-family: var(--font-mono);
   font-size: 0.65rem;
   letter-spacing: 0.04em;
   color: var(--ink-muted);
   line-height: 1.45;
+}
+
+.deskpulse__warn {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--warn);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.deskpulse__warn::before {
+  content: "!";
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.6rem;
+  line-height: 1;
 }
 
 .deskpulse__note.is-error {

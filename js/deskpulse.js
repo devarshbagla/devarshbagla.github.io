@@ -1,245 +1,352 @@
 /**
- * DeskPulse live demo — Web Audio haptic burst through laptop speakers.
- * Lazy AudioContext (gesture-gated), three 55Hz envelope bursts, envelope canvas,
- * mute control, graceful fallback. Audio still plays under prefers-reduced-motion.
+ * DeskPulse playground.
+ *
+ * Short low-frequency bursts through a lowpass filter, driving the voice coil
+ * hard enough that the chassis moves. Every burst is built from the same six
+ * numbers the sliders expose, and the envelope canvas is drawn from those same
+ * numbers — what you see is exactly what is scheduled.
+ *
+ *   osc(sine, freq) -> lowpass(cutoff) -> gain(attack/decay envelope) -> master
  */
 
-const BURST_COUNT = 3;
-const BURST_GAP_MS = 90;
-const ATTACK_S = 0.008;
-const DECAY_S = 0.18;
-const FREQ_HZ = 55;
-const FILTER_HZ = 120;
-const PEAK_GAIN = 0.85;
+import {
+  clamp,
+  cssVar,
+  fitCanvas,
+  cssSize,
+  prefersReducedMotion,
+  whenNear,
+} from "./util.js";
 
-function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const PEAK_GAIN = 0.85;
+const TAIL_S = 0.06;
+
+const PARAM_META = {
+  freq: { unit: "Hz", spoken: (v) => `base frequency ${v} hertz` },
+  bursts: { unit: "", spoken: (v) => `${v} ${v === 1 ? "burst" : "bursts"}` },
+  spacing: { unit: "ms", spoken: (v) => `burst spacing ${v} milliseconds` },
+  attack: { unit: "ms", spoken: (v) => `attack ${v} milliseconds` },
+  decay: { unit: "ms", spoken: (v) => `decay ${v} milliseconds` },
+  cutoff: { unit: "Hz", spoken: (v) => `lowpass cutoff ${v} hertz` },
+};
+
+/**
+ * Each preset is nothing but the six slider values, so the visualisation and
+ * the audio can never drift apart from what the controls say.
+ */
+const PRESETS = {
+  notification: { freq: 55, bursts: 2, spacing: 90, attack: 6, decay: 140, cutoff: 120 },
+  call: { freq: 45, bursts: 4, spacing: 210, attack: 12, decay: 260, cutoff: 100 },
+  email: { freq: 72, bursts: 1, spacing: 120, attack: 3, decay: 90, cutoff: 160 },
+  error: { freq: 36, bursts: 3, spacing: 60, attack: 2, decay: 220, cutoff: 70 },
+  heartbeat: { freq: 42, bursts: 2, spacing: 170, attack: 12, decay: 300, cutoff: 65 },
+};
+
+const PRESET_NAMES = {
+  notification: "Notification",
+  call: "Incoming call",
+  email: "New email",
+  error: "Error",
+  heartbeat: "Heartbeat",
+};
+
+/** Envelope as a polyline in seconds, identical to what the audio graph runs. */
+function buildEnvelope(p) {
+  const attack = p.attack / 1000;
+  const decay = p.decay / 1000;
+  const spacing = p.spacing / 1000;
+  const points = [{ t: 0, v: 0 }];
+  for (let i = 0; i < p.bursts; i += 1) {
+    const start = i * spacing;
+    points.push({ t: start, v: 0 });
+    points.push({ t: start + attack, v: 1 });
+    // Exponential-ish decay, sampled so the curve reads as a curve.
+    const steps = 14;
+    for (let s = 1; s <= steps; s += 1) {
+      const k = s / steps;
+      points.push({
+        t: start + attack + decay * k,
+        v: Math.exp(-4.2 * k),
+      });
+    }
+    points.push({ t: start + attack + decay, v: 0 });
+  }
+  const duration = (p.bursts - 1) * spacing + attack + decay + TAIL_S;
+  points.push({ t: duration, v: 0 });
+  return { points, duration };
 }
 
-function cssAccent() {
-  return (
-    getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() ||
-    "#e2703a"
-  );
+let mounted = false;
+let hostRef = null;
+
+function ensureMounted() {
+  if (mounted || !hostRef) return;
+  mounted = true;
+  mountDeskPulse(hostRef);
 }
 
 export function initDeskPulse(root = document) {
-  const host = root.querySelector("[data-deskpulse]");
-  if (!host) return;
+  hostRef = root.querySelector("[data-deskpulse]");
+  if (!hostRef) return;
+  whenNear(hostRef, ensureMounted);
+}
 
+function mountDeskPulse(host) {
   const playBtn = host.querySelector("[data-deskpulse-play]");
   const muteBtn = host.querySelector("[data-deskpulse-mute]");
+  const tuneBtn = host.querySelector("[data-deskpulse-toggle]");
+  const lab = host.querySelector("[data-deskpulse-lab]");
   const canvas = host.querySelector("[data-deskpulse-canvas]");
   const note = host.querySelector("[data-deskpulse-note]");
+  const statusEl = host.querySelector("[data-dsp-status]");
+  const ranges = Array.from(host.querySelectorAll("[data-dsp-param]"));
+  const chips = Array.from(host.querySelectorAll("[data-dsp-preset]"));
   if (!playBtn || !canvas) return;
 
   const ctx2d = canvas.getContext("2d");
+  const idleNote = note ? note.textContent.trim() : "";
+
   let audioCtx = null;
   let masterGain = null;
   let muted = false;
   let playing = false;
   let raf = 0;
-  let envelope = []; // {t, v} samples in seconds from burst start
-  let animStart = 0;
-  let animDuration = 0;
+  let playStart = 0;
 
-  function setNote(text, isError = false) {
-    if (!note) return;
-    note.textContent = text;
-    note.classList.toggle("is-error", isError);
+  let params = readParams();
+  let envelope = buildEnvelope(params);
+
+  /* ----------------------------------------------------------- parameters */
+
+  function readParams() {
+    const next = {};
+    ranges.forEach((input) => {
+      next[input.dataset.dspParam] = Number(input.value);
+    });
+    return {
+      freq: next.freq ?? 55,
+      bursts: next.bursts ?? 3,
+      spacing: next.spacing ?? 90,
+      attack: next.attack ?? 8,
+      decay: next.decay ?? 180,
+      cutoff: next.cutoff ?? 120,
+    };
   }
 
-  function resizeCanvas() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const rect = canvas.getBoundingClientRect();
-    const w = Math.max(1, Math.floor(rect.width));
-    const h = Math.max(1, Math.floor(rect.height));
-    canvas.width = Math.floor(w * dpr);
-    canvas.height = Math.floor(h * dpr);
-    if (ctx2d) ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
-    drawEnvelope(1);
+  function syncOutputs() {
+    ranges.forEach((input) => {
+      const key = input.dataset.dspParam;
+      const meta = PARAM_META[key];
+      const value = Number(input.value);
+      const text = meta.unit ? `${value} ${meta.unit}` : String(value);
+      const out = host.querySelector(`[data-dsp-out="${key}"]`);
+      if (out) out.textContent = text;
+      input.setAttribute("aria-valuetext", meta.spoken(value));
+      input.style.setProperty(
+        "--fill",
+        `${((value - Number(input.min)) / (Number(input.max) - Number(input.min))) * 100}%`
+      );
+    });
   }
+
+  function announce(text) {
+    if (statusEl) statusEl.textContent = text;
+  }
+
+  function refresh({ fromPreset = null } = {}) {
+    params = readParams();
+    envelope = buildEnvelope(params);
+    syncOutputs();
+    chips.forEach((chip) => {
+      const active = chip.dataset.dspPreset === fromPreset;
+      chip.setAttribute("aria-pressed", active ? "true" : "false");
+      chip.classList.toggle("is-active", active);
+    });
+    if (!playing) drawEnvelope(1);
+  }
+
+  /* --------------------------------------------------------------- canvas */
 
   function drawEnvelope(progress) {
     if (!ctx2d) return;
-    const w = canvas.getBoundingClientRect().width;
-    const h = canvas.getBoundingClientRect().height;
-    ctx2d.clearRect(0, 0, w, h);
+    const { width, height } = cssSize(canvas);
+    ctx2d.clearRect(0, 0, width, height);
 
-    // Baseline
-    ctx2d.strokeStyle = getComputedStyle(document.documentElement)
-      .getPropertyValue("--line")
-      .trim() || "#2a2622";
-    ctx2d.globalAlpha = 0.7;
+    const line = cssVar("--line", "#2a2622");
+    const accent = cssVar("--accent", "#e2703a");
+    const floor = height - 1;
+    const top = 4;
+
+    ctx2d.save();
+    ctx2d.strokeStyle = line;
+    ctx2d.globalAlpha = 0.8;
     ctx2d.lineWidth = 1;
     ctx2d.beginPath();
-    ctx2d.moveTo(0, h - 0.5);
-    ctx2d.lineTo(w, h - 0.5);
+    ctx2d.moveTo(0, floor - 0.5);
+    ctx2d.lineTo(width, floor - 0.5);
     ctx2d.stroke();
 
-    if (!envelope.length || animDuration <= 0) {
-      ctx2d.globalAlpha = 1;
-      return;
-    }
-
-    const accent = cssAccent();
-    ctx2d.globalAlpha = 1;
-    ctx2d.strokeStyle = accent;
-    ctx2d.fillStyle = accent;
-    ctx2d.lineWidth = 1.5;
+    // One faint tick per burst onset.
+    ctx2d.globalAlpha = 0.6;
+    ctx2d.setLineDash([2, 3]);
     ctx2d.beginPath();
+    for (let i = 0; i < params.bursts; i += 1) {
+      const x = Math.round(((i * params.spacing) / 1000 / envelope.duration) * width) + 0.5;
+      ctx2d.moveTo(x, 0);
+      ctx2d.lineTo(x, floor);
+    }
+    ctx2d.stroke();
+    ctx2d.setLineDash([]);
+    ctx2d.restore();
 
-    const visibleT = Math.min(animDuration, progress * animDuration);
+    const toX = (t) => (t / envelope.duration) * width;
+    const toY = (v) => floor - v * (floor - top);
+    const visible = progress * envelope.duration;
+
+    const path = new Path2D();
     let started = false;
-    for (const sample of envelope) {
-      if (sample.t > visibleT) break;
-      const x = (sample.t / animDuration) * w;
-      const y = h - sample.v * (h - 4) - 1;
+    for (const point of envelope.points) {
+      if (point.t > visible) break;
+      const x = toX(point.t);
+      const y = toY(point.v);
       if (!started) {
-        ctx2d.moveTo(x, y);
+        path.moveTo(x, y);
         started = true;
       } else {
-        ctx2d.lineTo(x, y);
+        path.lineTo(x, y);
       }
     }
-    if (started) {
-      ctx2d.stroke();
+    if (!started) return;
 
-      // Soft fill under the visible envelope
+    ctx2d.save();
+    const fill = new Path2D(path);
+    fill.lineTo(toX(Math.min(visible, envelope.duration)), floor);
+    fill.lineTo(0, floor);
+    fill.closePath();
+    ctx2d.fillStyle = accent;
+    ctx2d.globalAlpha = 0.14;
+    ctx2d.fill(fill);
+
+    ctx2d.globalAlpha = 1;
+    ctx2d.strokeStyle = accent;
+    ctx2d.lineWidth = 1.5;
+    ctx2d.lineJoin = "round";
+    ctx2d.stroke(path);
+
+    if (playing && progress < 1) {
+      const x = toX(visible);
+      ctx2d.globalAlpha = 0.85;
+      ctx2d.lineWidth = 1;
       ctx2d.beginPath();
-      let fillStarted = false;
-      for (const sample of envelope) {
-        if (sample.t > visibleT) break;
-        const x = (sample.t / animDuration) * w;
-        const y = h - sample.v * (h - 4) - 1;
-        if (!fillStarted) {
-          ctx2d.moveTo(x, h);
-          ctx2d.lineTo(x, y);
-          fillStarted = true;
-        } else {
-          ctx2d.lineTo(x, y);
-        }
-      }
-      if (fillStarted) {
-        ctx2d.lineTo((visibleT / animDuration) * w, h);
-        ctx2d.closePath();
-        ctx2d.globalAlpha = 0.15;
-        ctx2d.fill();
-        ctx2d.globalAlpha = 1;
-      }
+      ctx2d.moveTo(x + 0.5, 0);
+      ctx2d.lineTo(x + 0.5, floor);
+      ctx2d.stroke();
     }
+    ctx2d.restore();
   }
 
-  function buildEnvelopeTimeline() {
-    const samples = [];
-    for (let i = 0; i < BURST_COUNT; i++) {
-      const start = (i * BURST_GAP_MS) / 1000;
-      // Attack
-      samples.push({ t: start, v: 0 });
-      samples.push({ t: start + ATTACK_S, v: 1 });
-      // Decay
-      samples.push({ t: start + ATTACK_S + DECAY_S, v: 0 });
-      // Flat between bursts
-      if (i < BURST_COUNT - 1) {
-        samples.push({ t: start + BURST_GAP_MS / 1000, v: 0 });
-      }
-    }
-    envelope = samples;
-    animDuration =
-      ((BURST_COUNT - 1) * BURST_GAP_MS) / 1000 + ATTACK_S + DECAY_S + 0.05;
+  function resizeCanvas() {
+    fitCanvas(canvas, ctx2d);
+    drawEnvelope(playing ? 1 : 1);
   }
 
-  function animateEnvelope(now) {
-    if (!playing) return;
-    const elapsed = (now - animStart) / 1000;
-    const progress = Math.min(1, elapsed / animDuration);
-    if (!prefersReducedMotion()) {
-      drawEnvelope(progress);
-    } else {
-      // Static final envelope frame under reduced motion
-      drawEnvelope(1);
-    }
-    if (progress < 1) {
-      raf = requestAnimationFrame(animateEnvelope);
-    } else {
-      playing = false;
-      playBtn.disabled = false;
-    }
-  }
+  /* ---------------------------------------------------------------- audio */
 
-  async function ensureAudio() {
+  function ensureAudio() {
     if (audioCtx) return audioCtx;
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) {
-      throw new Error("Web Audio is not supported in this browser.");
-    }
-    audioCtx = new AC();
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) throw new Error("Web Audio is not supported in this browser.");
+    audioCtx = new AudioCtx();
     masterGain = audioCtx.createGain();
     masterGain.gain.value = muted ? 0 : 1;
     masterGain.connect(audioCtx.destination);
     return audioCtx;
   }
 
-  function scheduleBurst(ctx, when) {
+  function scheduleBurst(ctx, when, p) {
     const osc = ctx.createOscillator();
     const filter = ctx.createBiquadFilter();
     const gain = ctx.createGain();
 
     osc.type = "sine";
-    osc.frequency.value = FREQ_HZ;
+    osc.frequency.value = p.freq;
 
     filter.type = "lowpass";
-    filter.frequency.value = FILTER_HZ;
+    filter.frequency.value = p.cutoff;
     filter.Q.value = 0.7;
 
+    const attack = p.attack / 1000;
+    const decay = p.decay / 1000;
     gain.gain.setValueAtTime(0.0001, when);
-    gain.gain.exponentialRampToValueAtTime(PEAK_GAIN, when + ATTACK_S);
-    gain.gain.exponentialRampToValueAtTime(0.0001, when + ATTACK_S + DECAY_S);
+    gain.gain.exponentialRampToValueAtTime(PEAK_GAIN, when + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + attack + decay);
 
     osc.connect(filter);
     filter.connect(gain);
     gain.connect(masterGain);
 
     osc.start(when);
-    osc.stop(when + ATTACK_S + DECAY_S + 0.02);
+    osc.stop(when + attack + decay + 0.02);
   }
 
-  async function play() {
+  function animate(now) {
+    if (!playing) return;
+    const elapsed = (now - playStart) / 1000;
+    const progress = clamp(elapsed / envelope.duration, 0, 1);
+    drawEnvelope(prefersReducedMotion() ? 1 : progress);
+    if (progress < 1) {
+      raf = requestAnimationFrame(animate);
+    } else {
+      playing = false;
+      playBtn.disabled = false;
+      drawEnvelope(1);
+    }
+  }
+
+  async function play(label) {
     if (playing) return;
     playBtn.disabled = true;
-
     try {
-      const ctx = await ensureAudio();
-      if (ctx.state === "suspended") {
-        await ctx.resume();
-      }
+      const ctx = ensureAudio();
+      if (ctx.state === "suspended") await ctx.resume();
       if (ctx.state !== "running") {
         throw new Error("AudioContext could not start. Check browser permissions.");
       }
 
-      setNote(
-        "Best on a laptop with the volume up. You should feel it more than hear it."
-      );
-
-      const startAt = ctx.currentTime + 0.02;
-      for (let i = 0; i < BURST_COUNT; i++) {
-        scheduleBurst(ctx, startAt + (i * BURST_GAP_MS) / 1000);
+      if (note) {
+        note.textContent = idleNote;
+        note.classList.remove("is-error");
       }
 
-      buildEnvelopeTimeline();
+      const startAt = ctx.currentTime + 0.03;
+      for (let i = 0; i < params.bursts; i += 1) {
+        scheduleBurst(ctx, startAt + (i * params.spacing) / 1000, params);
+      }
+      announce(`${label || "Pattern"} playing. ${describe()}`);
+
       playing = true;
-      animStart = performance.now();
+      playStart = performance.now();
       if (raf) cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(animateEnvelope);
+      raf = requestAnimationFrame(animate);
     } catch (err) {
       playing = false;
       playBtn.disabled = false;
-      const message =
-        err && err.message
-          ? err.message
-          : "Could not start audio. Try another browser or check site permissions.";
-      setNote(message, true);
+      if (note) {
+        note.textContent =
+          err && err.message
+            ? err.message
+            : "Could not start audio. Try another browser or check site permissions.";
+        note.classList.add("is-error");
+      }
     }
+  }
+
+  function describe() {
+    return (
+      `${params.bursts} ${params.bursts === 1 ? "burst" : "bursts"} at ${params.freq} hertz, ` +
+      `${params.spacing} millisecond spacing, ${params.attack} millisecond attack, ` +
+      `${params.decay} millisecond decay, lowpass at ${params.cutoff} hertz.`
+    );
   }
 
   function toggleMute() {
@@ -247,21 +354,24 @@ export function initDeskPulse(root = document) {
     if (masterGain && audioCtx) {
       masterGain.gain.setTargetAtTime(muted ? 0 : 1, audioCtx.currentTime, 0.01);
     }
-    if (muteBtn) {
-      muteBtn.setAttribute("aria-pressed", muted ? "true" : "false");
-      muteBtn.setAttribute("aria-label", muted ? "Unmute DeskPulse demo" : "Mute DeskPulse demo");
-      muteBtn.title = muted ? "Unmute" : "Mute";
-      const onIcon = muteBtn.querySelector(".deskpulse__mute-on");
-      const offIcon = muteBtn.querySelector(".deskpulse__mute-off");
-      if (onIcon) onIcon.toggleAttribute("hidden", muted);
-      if (offIcon) offIcon.toggleAttribute("hidden", !muted);
-    }
+    if (!muteBtn) return;
+    muteBtn.setAttribute("aria-pressed", muted ? "true" : "false");
+    const label = muted ? "Unmute DeskPulse demo" : "Mute DeskPulse demo";
+    muteBtn.setAttribute("aria-label", label);
+    muteBtn.title = muted ? "Unmute" : "Mute";
+    const onIcon = muteBtn.querySelector(".deskpulse__mute-on");
+    const offIcon = muteBtn.querySelector(".deskpulse__mute-off");
+    if (onIcon) onIcon.toggleAttribute("hidden", muted);
+    if (offIcon) offIcon.toggleAttribute("hidden", !muted);
+    announce(muted ? "Output muted." : "Output unmuted.");
   }
+
+  /* -------------------------------------------------------------- wiring */
 
   playBtn.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    play();
+    play("Current settings");
   });
 
   if (muteBtn) {
@@ -272,16 +382,61 @@ export function initDeskPulse(root = document) {
     });
   }
 
-  resizeCanvas();
+  if (tuneBtn && lab) {
+    tuneBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const open = tuneBtn.getAttribute("aria-expanded") === "true";
+      tuneBtn.setAttribute("aria-expanded", open ? "false" : "true");
+      lab.hidden = open;
+      tuneBtn.textContent = open ? "Tune it" : "Hide controls";
+      if (!open) {
+        resizeCanvas();
+        const first = lab.querySelector("[data-dsp-preset]");
+        if (first) first.focus();
+      }
+    });
+  }
+
+  ranges.forEach((input) => {
+    input.addEventListener("input", (event) => {
+      event.stopPropagation();
+      refresh();
+    });
+    input.addEventListener("change", () => {
+      const key = input.dataset.dspParam;
+      announce(PARAM_META[key].spoken(Number(input.value)));
+    });
+    input.addEventListener("keydown", (event) => event.stopPropagation());
+  });
+
+  chips.forEach((chip) => {
+    chip.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const preset = PRESETS[chip.dataset.dspPreset];
+      if (!preset) return;
+      ranges.forEach((input) => {
+        const key = input.dataset.dspParam;
+        if (preset[key] !== undefined) input.value = String(preset[key]);
+      });
+      refresh({ fromPreset: chip.dataset.dspPreset });
+      play(PRESET_NAMES[chip.dataset.dspPreset]);
+    });
+  });
+
   const ro = new ResizeObserver(() => resizeCanvas());
   ro.observe(canvas);
 
-  // Retint idle canvas on theme change
-  const mo = new MutationObserver(() => drawEnvelope(playing ? 1 : 1));
+  const mo = new MutationObserver(() => drawEnvelope(1));
   mo.observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["data-theme"],
   });
+
+  syncOutputs();
+  resizeCanvas();
+  refresh();
 }
 
 function bindCardEnter(card) {
@@ -299,4 +454,17 @@ function bindCardEnter(card) {
 
 export function initProjectCards(root = document) {
   root.querySelectorAll("[data-project-card], [data-work-card]").forEach(bindCardEnter);
+}
+
+/** Used by the "deskpulse" typing easter egg and the command palette. */
+export function triggerDeskPulse() {
+  ensureMounted();
+  const btn = document.querySelector("[data-deskpulse-play]");
+  if (!btn) return false;
+  btn.scrollIntoView({
+    block: "center",
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+  });
+  btn.click();
+  return true;
 }
