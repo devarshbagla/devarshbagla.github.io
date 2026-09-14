@@ -1311,7 +1311,17 @@
 }
 
 .workbench__svg.has-active .workbench__node.is-dimmed {
-  opacity: 0.35;
+  opacity: 0.3;
+}
+
+.workbench__arrow.is-lit {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: none;
+}
+
+.workbench__svg.has-active .workbench__arrow:not(.is-lit) {
+  opacity: 0.3;
 }
 
 .workbench__node:focus-visible .workbench__node-disk {

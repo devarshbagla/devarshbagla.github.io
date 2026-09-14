@@ -29,6 +29,8 @@ const POINTER_RADIUS = 155;
 const POINTER_FORCE = 2.2;
 const SEPARATION = NODE_R * 2 + 8;
 const PULSE_LOOPS_PER_SECOND = 0.16;
+const FLOAT_AMP = 5.5;
+const FLOAT_SPEED = 0.55;
 
 const NODES = [
   {
@@ -36,11 +38,8 @@ const NODES = [
     label: "SKETCH",
     caption: "Observational drawing. I can record a form accurately from life.",
     detail:
-      "The only part of this loop I was formally taught, and the part most CS " +
-      "students skip entirely. Observational drawing is not decoration, it is a " +
-      "way of looking hard enough at a thing to describe it accurately. Every " +
-      "panel on this site existed on paper before it existed in CSS: the scope " +
-      "frame, the DSP lab, the confusion matrix.",
+      "Three years of woodworking taught me to look at a form before cutting " +
+      "it. Observational drawing is the same habit with a pencil.",
     links: [
       { href: "#project-deskpulse", label: "DeskPulse" },
       { href: "#project-casio-fx-cg50", label: "Casio fx-CG50 Replica" },
@@ -51,22 +50,15 @@ const NODES = [
     label: "CAD",
     caption: "Learning now. The missing link between the sketch and the part.",
     detail:
-      "The gap I am actively closing. I can draw a part by hand and I can print " +
-      "someone else's model, but I cannot yet produce the file in between. That " +
-      "is the whole reason this is a loop and not a list — it is on the diagram " +
-      "because it is missing, not because it is done.",
+      "The missing link, and the thing I am learning right now. Until it is " +
+      "there I can only print what someone else designed.",
     links: [],
   },
   {
     id: "print",
     label: "3D PRINT",
     caption: "Certified on Prusa Mini+ at the Brandeis MakerLab.",
-    detail:
-      "FDM on a Prusa Mini+, certified through the Brandeis MakerLab. Working in " +
-      "layers means thinking about overhangs, orientation and where a part will " +
-      "actually snap, which is a different kind of constraint from anything in " +
-      "software. Currently printing other people's models, which is precisely " +
-      "what the CAD node is meant to fix.",
+    detail: "Certified on the Prusa Mini+ at the Brandeis MakerLab.",
     links: [],
   },
   {
@@ -74,10 +66,8 @@ const NODES = [
     label: "SOLDER",
     caption: "Hands-on. Most CS students have never held an iron.",
     detail:
-      "Through-hole and light surface mount, an iron and a multimeter. Three " +
-      "years running a school AV squad means most of my soldering was repair " +
-      "under time pressure rather than assembly on a clean bench: a dead XLR " +
-      "line twenty minutes before assembly, with four hundred people arriving.",
+      "Hands-on, mostly repair under time pressure. Most CS students have " +
+      "never held an iron.",
     links: [{ href: "#teaching", label: "AV Squad, The Scindia School" }],
   },
   {
@@ -85,10 +75,7 @@ const NODES = [
     label: "PROGRAM",
     caption: "ESP32 and WLED for anything that needs to light up, move or sense.",
     detail:
-      "The node with the most output, and the one I lean on when the others are " +
-      "not ready yet. ESP32 and WLED for anything physical; Python for research " +
-      "pipelines; plain JavaScript for the web. DeskPulse only exists because a " +
-      "speaker can be programmed into a haptic motor.",
+      "ESP32 and WLED for anything that needs to light up, move or sense.",
     links: [
       { href: "#project-deskpulse", label: "DeskPulse" },
       { href: "#project-lizi", label: "LIZI" },
@@ -102,10 +89,8 @@ const NODES = [
     label: "TEST",
     caption: "I like breaking things more than building them. It is the same skill.",
     detail:
-      "Finding the failure is the same skill as designing for it, run backwards. " +
-      "The Chess Coach storage layer got rebuilt because a refresh ate a game. " +
-      "From Dust to Zenith shipped and then got a full UI audit. DeskPulse has a " +
-      "warning about headphones because testing is how I learned it was needed.",
+      "I enjoy breaking things more than building them. It is the same skill " +
+      "pointed the other way.",
     links: [
       { href: "#project-chess-coach", label: "Chess Coach" },
       { href: "#project-from-dust-to-zenith", label: "From Dust to Zenith" },
@@ -141,7 +126,15 @@ function mountWorkbench(host) {
 
   const bodies = NODES.map((node, i) => {
     const home = polar((360 / NODES.length) * i);
-    return { ...node, home, x: home.x, y: home.y, vx: 0, vy: 0 };
+    return {
+      ...node,
+      home,
+      x: home.x,
+      y: home.y,
+      vx: 0,
+      vy: 0,
+      phase: i * 1.17,
+    };
   });
 
   const svg = svgEl("svg", {
@@ -256,10 +249,13 @@ function mountWorkbench(host) {
     const dt = lastTime ? Math.min(0.05, (now - lastTime) / 1000) : 0.016;
     lastTime = now;
 
+    const t = now / 1000;
     bodies.forEach((body) => {
       if (dragging === body) return;
-      let ax = (body.home.x - body.x) * SPRING;
-      let ay = (body.home.y - body.y) * SPRING;
+      const floatX = Math.sin(t * FLOAT_SPEED + body.phase) * FLOAT_AMP;
+      const floatY = Math.cos(t * (FLOAT_SPEED * 0.82) + body.phase * 1.35) * FLOAT_AMP;
+      let ax = (body.home.x + floatX - body.x) * SPRING;
+      let ay = (body.home.y + floatY - body.y) * SPRING;
 
       if (pointer) {
         const dx = body.x - pointer.x;
@@ -434,6 +430,11 @@ function mountWorkbench(host) {
       g.classList.toggle("is-dimmed", Boolean(id) && !active);
     });
     svg.classList.toggle("has-active", Boolean(id));
+    edges.forEach((path, i) => {
+      const a = bodies[i].id;
+      const b = bodies[(i + 1) % bodies.length].id;
+      path.classList.toggle("is-lit", Boolean(id) && (a === id || b === id));
+    });
     if (!caption) return;
     const node = NODES.find((n) => n.id === id);
     caption.textContent = node ? node.caption : idleCaption;
