@@ -987,19 +987,30 @@
         aria-label="Terminal"
       >
         <div class="terminal__chrome">
-          <span class="terminal__title">devarsh@workbench:~</span>
+          <span class="terminal__title" data-terminal-title>devarsh@workbench:~</span>
+          <span class="terminal__hint" aria-hidden="true">TAB ↹ · ↑↓ HISTORY · CTRL+L · ESC</span>
           <button type="button" class="terminal__close" data-terminal-close aria-label="Close terminal">×</button>
         </div>
-        <div class="terminal__screen" data-terminal-screen aria-live="polite"></div>
-        <div class="visually-hidden" data-terminal-live aria-live="polite"></div>
+        <div
+          class="terminal__screen"
+          data-terminal-screen
+          aria-live="polite"
+          aria-atomic="false"
+          aria-label="Terminal output"
+          role="log"
+          tabindex="0"
+        ></div>
+        <div class="visually-hidden" data-terminal-live role="status" aria-live="polite"></div>
         <form class="terminal__form" data-terminal-form>
-          <label class="terminal__prompt" for="terminal-input">devarsh@workbench:~$</label>
+          <label class="terminal__prompt" for="terminal-input" data-terminal-prompt>devarsh@workbench:~$</label>
           <input
             id="terminal-input"
             class="terminal__input"
             type="text"
             data-terminal-input
             autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
             spellcheck="false"
             aria-label="Terminal command"
           >

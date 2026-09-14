@@ -1378,6 +1378,26 @@ body.terminal-open {
   font-size: var(--step--1);
   letter-spacing: 0.04em;
   color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.terminal__hint {
+  flex: 1;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  color: color-mix(in srgb, var(--ink-muted) 70%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@media (max-width: 560px) {
+  .terminal__hint {
+    display: none;
+  }
 }
 
 .terminal__close {
@@ -1409,13 +1429,54 @@ body.terminal-open {
 }
 
 .terminal__line {
-  margin: 0 0 0.55rem;
+  margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
+.terminal__line--blank {
+  height: 0.85em;
+}
+
+.terminal__line--cmd {
+  margin-top: 0.8rem;
+}
+
+.terminal__line--cmd:first-child {
+  margin-top: 0;
+}
+
 .terminal__line--cmd {
   color: var(--accent);
+}
+
+.terminal__line--err {
+  color: var(--warn);
+}
+
+.terminal__screen:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
+}
+
+/* Blinking caret only while output is still being typed. */
+.terminal.is-typing .terminal__line:last-child::after {
+  content: "▌";
+  margin-left: 1px;
+  color: var(--accent);
+  animation: terminal-caret 900ms steps(2, start) infinite;
+}
+
+@keyframes terminal-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal.is-typing .terminal__line:last-child::after {
+    animation: none;
+  }
 }
 
 .terminal__form {
