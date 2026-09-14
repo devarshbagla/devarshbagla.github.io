@@ -146,7 +146,7 @@
 }
 
 .scope__state.is-live {
-  color: var(--ok);
+  color: var(--ink);
 }
 
 .scope__state.is-live::before {
