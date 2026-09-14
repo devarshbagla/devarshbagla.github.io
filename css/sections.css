@@ -422,6 +422,7 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
+  outline: none;
   transition:
     transform 220ms var(--ease-out),
     border-color 220ms var(--ease-out),
@@ -437,10 +438,6 @@
   width: 2px;
   background: var(--accent);
   border-radius: 1px;
-}
-
-.work-card {
-  outline: none;
 }
 
 .work-card:hover,
