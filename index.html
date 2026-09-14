@@ -484,8 +484,149 @@
           </div>
         </div>
       </section>
-      <section id="research" aria-label="Research"></section>
-      <section id="teaching" aria-label="Teaching"></section>
+      <section id="research" class="section research" aria-labelledby="research-heading">
+        <div class="container">
+          <p class="section__label" id="research-heading" data-reveal>04 / RESEARCH</p>
+
+          <article class="research-paper" data-reveal>
+            <header class="research-paper__header">
+              <h2 class="research-paper__title">
+                Deep Learning Approaches for Churn Prediction: An Empirical Evaluation on
+                Real-World Business Datasets
+              </h2>
+              <p class="research-paper__byline">DEVARSH BAGLA · SOLE AUTHOR</p>
+              <p class="research-paper__pub">
+                INTERNATIONAL JOURNAL OF SCIENTIFIC ENGINEERING AND RESEARCH · VOL 13, ISSUE 10 · OCTOBER 2025
+              </p>
+              <div class="research-paper__actions">
+                <a
+                  class="btn btn--primary"
+                  href="https://www.ijser.in/archives/v13i10/SE251005174007.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >Read the paper</a>
+                <a
+                  class="btn btn--ghost"
+                  href="https://dx.doi.org/10.70729/SE251005174007"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >DOI</a>
+              </div>
+            </header>
+
+            <p class="research-paper__abstract">
+              Benchmarked three approaches to customer churn prediction on a 64,374-record
+              dataset with 12 attributes. Built the full preprocessing pipeline: mean and
+              mode imputation, one-hot encoding, min-max normalisation, IQR-based outlier
+              handling, and SMOTE oversampling to correct class imbalance. Ran three
+              independent feature selection methods in WEKA, which converged on the same
+              ten-attribute subset. Hyperparameters tuned by grid search under ten-fold
+              cross-validation.
+            </p>
+
+            <div class="research-chart" data-research-chart>
+              <div class="research-chart__legend" aria-hidden="true">
+                <span class="research-chart__swatch research-chart__swatch--lr">Logistic Regression</span>
+                <span class="research-chart__swatch research-chart__swatch--rf">Random Forest</span>
+                <span class="research-chart__swatch research-chart__swatch--dnn">Deep Neural Network</span>
+              </div>
+              <div class="research-chart__frame" data-research-chart-frame>
+                <div class="research-chart__svg-host" data-research-chart-host></div>
+                <div class="research-chart__tooltip" data-research-chart-tooltip hidden role="tooltip"></div>
+              </div>
+              <p class="research-chart__axis-note">Axis begins at 70 to make the differences legible.</p>
+              <p class="research-chart__config">
+                RANDOM FOREST: 200 TREES · DNN: 3 HIDDEN LAYERS, RELU, 0.3 DROPOUT, ADAM ·
+                TUNING: GRID SEARCH, 10-FOLD CV · TOOLING: WEKA
+              </p>
+            </div>
+
+            <aside class="research-note" data-reveal>
+              <p class="research-note__label">Method note</p>
+              <p class="research-note__body">
+                Feature selection ran three ways: correlation-based selection with best-first
+                search across 72 subsets at merit 0.621, a classifier attribute evaluator with
+                ranker, and CfsSubsetEval with greedy stepwise. All three converged on the
+                same ten attributes, with recency of last interaction the strongest single
+                predictor.
+              </p>
+            </aside>
+          </article>
+        </div>
+      </section>
+
+      <section id="teaching" class="section teaching" aria-labelledby="teaching-heading">
+        <div class="container">
+          <p class="section__label" id="teaching-heading" data-reveal>05 / TEACHING AND COMMUNITY</p>
+
+          <ol class="timeline" data-reveal>
+            <li class="timeline__item">
+              <div class="timeline__node" aria-hidden="true"></div>
+              <div class="timeline__card">
+                <p class="timeline__when">2025–2026 · MENTOR, BYTEBUILDERS</p>
+                <p class="timeline__body">
+                  My school's computer club, open to any student rather than only those taking
+                  CS. Mentored 15 students for two hours a week across a full academic year,
+                  roughly 72 contact hours, working from whatever each person actually wanted
+                  to build instead of a syllabus. Several of them had never written a line of
+                  code.
+                </p>
+                <p class="timeline__stat">15 STUDENTS · 72 HOURS</p>
+              </div>
+            </li>
+
+            <li class="timeline__item">
+              <div class="timeline__node" aria-hidden="true"></div>
+              <div class="timeline__card">
+                <p class="timeline__when">2024–2025 · CAMPAIGN LEAD, FUELADREAM x GO GIRL FOUNDATION</p>
+                <p class="timeline__body">
+                  Founded and ran a crowdfunding campaign distributing reusable sanitary pads
+                  to girls and women in rural Rajasthan. No institutional backing, no mailing
+                  list, no existing audience. Most gifts came in at a few dollars each, so it
+                  was 52 separate conversations and follow-ups rather than a handful of large
+                  donations. I travelled to the schools and handed the products over myself.
+                </p>
+                <p class="timeline__stat">290% OF TARGET · 52 FUNDERS</p>
+                <a
+                  class="timeline__link"
+                  href="https://www.fueladream.com/home/campaign/73792"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >fueladream.com</a>
+              </div>
+            </li>
+
+            <li class="timeline__item">
+              <div class="timeline__node" aria-hidden="true"></div>
+              <div class="timeline__card">
+                <p class="timeline__when">2021–2024 · SECRETARY, AUDIO-VISUAL SQUAD, THE SCINDIA SCHOOL</p>
+                <p class="timeline__body">
+                  Three years from member to Joint Secretary to Secretary. Led a five-person
+                  technical team running sound, lighting and projection for daily assemblies
+                  and more than thirty major events, including inter-school festivals with
+                  outside performers and audiences of several hundred. Most of what I learned
+                  was about failure: late vendors, microphones dying mid-performance, cues
+                  changing during the show.
+                </p>
+                <p class="timeline__stat">30+ EVENTS · TEAM OF 5</p>
+              </div>
+            </li>
+
+            <li class="timeline__item">
+              <div class="timeline__node" aria-hidden="true"></div>
+              <div class="timeline__card">
+                <p class="timeline__when">2023 · SCHOOL RENOVATION, BHIND, MADHYA PRADESH</p>
+                <p class="timeline__body">
+                  One week with roughly a hundred classmates rebuilding a rural government
+                  primary school serving around a thousand children. Hand-mixed cement,
+                  bricklaying, foundations and painting, in temperatures near 45°C.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
       <section id="workbench" aria-label="Workbench"></section>
       <section id="contact" aria-label="Contact"></section>
     </main>

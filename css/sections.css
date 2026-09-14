@@ -698,3 +698,323 @@
     transform: none;
   }
 }
+
+/* —— Research —— */
+.research-paper {
+  max-width: 52rem;
+}
+
+.research-paper__title {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.research-paper__byline,
+.research-paper__pub {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.research-paper__byline {
+  color: var(--ink);
+}
+
+.research-paper__pub {
+  margin-top: var(--space-2);
+  color: var(--ink-muted);
+}
+
+.research-paper__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.research-paper__abstract {
+  margin: var(--space-7) 0 0;
+  max-width: 68ch;
+  color: var(--ink-muted);
+  line-height: 1.7;
+}
+
+.research-chart {
+  margin-top: var(--space-7);
+}
+
+.research-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.research-chart__swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+}
+
+.research-chart__swatch::before {
+  content: "";
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.research-chart__swatch--lr {
+  color: var(--ink-muted);
+}
+
+.research-chart__swatch--rf {
+  color: var(--cool);
+}
+
+.research-chart__swatch--dnn {
+  color: var(--accent);
+}
+
+.research-chart__frame {
+  position: relative;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}
+
+.research-chart__svg-host {
+  width: 100%;
+  min-height: 280px;
+}
+
+.research-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.research-chart__grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.research-chart__tick,
+.research-chart__metric {
+  fill: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+.research-chart__bar {
+  cursor: pointer;
+  outline: none;
+}
+
+.research-chart__bar:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.research-chart__tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.research-chart__axis-note,
+.research-chart__config {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+.research-chart__config {
+  margin-top: var(--space-2);
+  text-transform: uppercase;
+}
+
+.research-note {
+  margin-top: var(--space-7);
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
+.research-note__label {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.research-note__body {
+  margin: 0;
+  max-width: 68ch;
+  color: var(--ink-muted);
+  line-height: 1.65;
+}
+
+/* —— Teaching timeline —— */
+.timeline {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  left: 50%;
+  width: 1px;
+  background: var(--line);
+  transform: translateX(-50%);
+}
+
+.timeline__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-7);
+  margin-bottom: var(--space-8);
+}
+
+.timeline__item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline__node {
+  position: absolute;
+  top: 0.45rem;
+  left: 50%;
+  z-index: 1;
+  width: 0.65rem;
+  height: 0.65rem;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--bg);
+  transform: translateX(-50%);
+}
+
+.timeline__card {
+  grid-column: 1;
+  justify-self: end;
+  width: min(100%, 28rem);
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.timeline__item:nth-child(even) .timeline__card {
+  grid-column: 2;
+  justify-self: start;
+}
+
+.timeline__when {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.timeline__body {
+  margin: 0;
+  color: var(--ink-muted);
+  line-height: 1.65;
+}
+
+.timeline__stat {
+  display: inline-block;
+  margin: var(--space-4) 0 0;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.timeline__link {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.timeline__link:hover {
+  border-bottom-color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .timeline::before {
+    left: 0.3rem;
+    transform: none;
+  }
+
+  .timeline__item {
+    display: block;
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+
+  .timeline__node {
+    left: 0;
+    transform: none;
+  }
+
+  .timeline__card,
+  .timeline__item:nth-child(even) .timeline__card {
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .research-chart__legend {
+    gap: var(--space-3);
+  }
+}
