@@ -18,6 +18,7 @@ const COMMANDS = [
   { id: "sec-projects", category: "Sections", label: "Projects", keywords: "projects", action: { type: "scroll", target: "#projects" } },
   { id: "sec-research", category: "Sections", label: "Research", keywords: "research paper churn", action: { type: "scroll", target: "#research" } },
   { id: "sec-teaching", category: "Sections", label: "Teaching", keywords: "teaching community", action: { type: "scroll", target: "#teaching" } },
+  { id: "sec-before", category: "Sections", label: "Before this", keywords: "ib diploma scindia harmonium finance nse", action: { type: "scroll", target: "#before" } },
   { id: "sec-workbench", category: "Sections", label: "The Workbench", keywords: "workbench loop sketch cad", action: { type: "scroll", target: "#workbench" } },
   { id: "sec-stack", category: "Sections", label: "Stack", keywords: "stack languages python tools", action: { type: "scroll", target: "#stack" } },
   { id: "sec-contact", category: "Sections", label: "Contact", keywords: "contact email", action: { type: "scroll", target: "#contact" } },

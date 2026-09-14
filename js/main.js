@@ -12,6 +12,7 @@ import { initScrollSpy, initMagnetic, initScramble } from "./nav.js";
 import { initPerfHud } from "./perf.js";
 import { initEaster } from "./easter.js";
 import { whenNear } from "./util.js";
+import { initTablist } from "./tabs.js";
 
 function initHeaderScroll() {
   const header = document.querySelector("[data-site-header]");
@@ -135,6 +136,7 @@ initDeskPulse();
 initProjectCards();
 whenNear(document.querySelector("[data-research-chart]"), () => initResearchChart());
 initChurn();
+initTablist(document.querySelector("[data-before-tabs]"));
 initWorkbench();
 initTerminal();
 initPalette();

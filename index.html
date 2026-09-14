@@ -217,6 +217,7 @@
               <li><a class="site-nav__link" href="#projects">Projects</a></li>
               <li><a class="site-nav__link" href="#research">Research</a></li>
               <li><a class="site-nav__link" href="#teaching">Teaching</a></li>
+              <li><a class="site-nav__link" href="#before">Before</a></li>
               <li><a class="site-nav__link" href="#workbench">Workbench</a></li>
               <li><a class="site-nav__link" href="#stack">Stack</a></li>
               <li><a class="site-nav__link" href="#contact">Contact</a></li>
@@ -257,7 +258,7 @@
     <!--
       Section numbers must stay sequential in DOM order.
       Current list: 01 ABOUT, 02 NOW, 03 WORK, 04 PROJECTS, 05 RESEARCH,
-      06 TEACHING, 07 WORKBENCH, 08 STACK, 09 CONTACT.
+      06 TEACHING, 07 BEFORE THIS, 08 WORKBENCH, 09 STACK, 10 CONTACT.
       Inserted sections take the next number in place and everything after
       them shifts so the rendered labels never scramble again.
     -->
@@ -1028,9 +1029,87 @@
         </div>
       </section>
 
+      <section id="before" class="section before" aria-labelledby="before-heading">
+        <div class="container">
+          <p class="section__label" id="before-heading" data-reveal>07 / BEFORE THIS</p>
+          <div class="before__tabs" data-before-tabs data-reveal>
+            <div class="before__tablist" role="tablist" aria-label="Before this">
+              <button type="button" class="before__tab is-active" role="tab" id="before-tab-ib" aria-controls="before-panel-ib" aria-selected="true">THE IB DIPLOMA</button>
+              <button type="button" class="before__tab" role="tab" id="before-tab-scindia" aria-controls="before-panel-scindia" aria-selected="false" tabindex="-1">THE SCINDIA SCHOOL</button>
+              <button type="button" class="before__tab" role="tab" id="before-tab-finance" aria-controls="before-panel-finance" aria-selected="false" tabindex="-1">FINANCE</button>
+            </div>
+
+            <div class="before__panel" role="tabpanel" id="before-panel-ib" aria-labelledby="before-tab-ib">
+              <p>
+                Two years, six subjects, three at Higher Level. Mine were Computer Science,
+                Economics and Mathematics Analysis and Approaches AI, with English, Business
+                Management and French ab initio at Standard Level.
+              </p>
+              <p>
+                The Mathematics internal assessment was a used-car resale pricing model built
+                with polynomial regression: collecting the data myself, choosing the degree,
+                and then spending most of the write-up on why a higher-degree fit that looked
+                better was actually worse. That was the first time overfitting stopped being
+                a word in a textbook.
+              </p>
+              <p>
+                Computer Science HL is what got me eight credits of advanced standing at
+                Brandeis, so I started a year ahead of the standard sequence.
+              </p>
+              <p class="before__meta">HL COMPUTER SCIENCE · HL ECONOMICS · HL MATHEMATICS AI · 8 CREDITS OF ADVANCED STANDING</p>
+            </div>
+
+            <div class="before__panel" role="tabpanel" id="before-panel-scindia" aria-labelledby="before-tab-scindia" hidden>
+              <p>
+                Three years at a residential boarding school in Gwalior, grades 8 to 10. It
+                ran on assemblies, inter-school festivals and stage events, which is where
+                almost everything else on this page comes from.
+              </p>
+              <p>
+                I learned the harmonium there and kept at it for three years. Classical ragas,
+                performed on stage for audiences of six hundred students across more than
+                fifteen events, plus intra-school competitions I won a few of. I hold
+                certificates in both harmonium and vocal performance. What it actually taught
+                me was narrower than music: I kept failing one fast passage while playing the
+                rest cleanly, and the fix was to stop drilling the passage and start listening
+                to the whole piece. Most of my debugging works the same way now.
+              </p>
+              <p>
+                I also placed second in English Debate and second in English Elocution. That
+                is the only formal training I have in arguing a position out loud, and it has
+                been more useful than it sounds.
+              </p>
+              <p>
+                And I did woodworking every week for three years, which has no undo button. A
+                palm-sized owl, a wooden fish, a nameplate, a tribal mask, and a Ganesha
+                holding a modak in his trunk. Chisel, then the sander, then hours of
+                sandpaper. It is where I learned what finished actually feels like.
+              </p>
+              <p class="before__meta">3 YEARS HARMONIUM · 15+ PERFORMANCES · 600+ AUDIENCE · 2ND, ENGLISH DEBATE · 2ND, ENGLISH ELOCUTION · 3 YEARS WOODWORKING</p>
+            </div>
+
+            <div class="before__panel" role="tabpanel" id="before-panel-finance" aria-labelledby="before-tab-finance" hidden>
+              <p>
+                Finance 101 through NSE Academy, the National Stock Exchange of India's
+                education arm, run with Empirical Academy. Ten hours, self-paced: primary and
+                secondary markets, IPO mechanics, how stock indices are actually constructed
+                (market-cap weighted versus price weighted versus equally weighted), and the
+                time value of money.
+              </p>
+              <p>
+                The useful part was the NSE Smart simulator, where you build and hold a
+                portfolio rather than answer questions about one. It is an introductory course,
+                not a professional credential, but it is why the finance minor made sense.
+              </p>
+              <p class="before__meta">NSE ACADEMY · 10 HOURS · PORTFOLIO SIMULATION</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="workbench" class="section workbench" aria-labelledby="workbench-heading">
         <div class="container">
-          <p class="section__label" id="workbench-heading" data-reveal>07 / THE WORKBENCH</p>
+          <p class="section__label" id="workbench-heading" data-reveal>08 / THE WORKBENCH</p>
           <p class="workbench__lede" data-reveal>
             Most CS students cannot draw. Most designers cannot program. This is the loop I am trying to close.
           </p>
@@ -1048,7 +1127,7 @@
 
       <section id="stack" class="section stack" aria-labelledby="stack-heading">
         <div class="container">
-          <p class="section__label" id="stack-heading" data-reveal>08 / STACK</p>
+          <p class="section__label" id="stack-heading" data-reveal>09 / STACK</p>
           <p class="stack__lede" data-reveal>
             What I actually use, grouped honestly. Hover or focus a chip for depth.
             Nothing here is claimed beyond what I have done with it.
@@ -1116,7 +1195,7 @@
 
       <section id="contact" class="section contact" aria-labelledby="contact-heading">
         <div class="container">
-          <p class="section__label" id="contact-heading" data-reveal>09 / CONTACT</p>
+          <p class="section__label" id="contact-heading" data-reveal>10 / CONTACT</p>
           <div class="contact__inner" data-reveal>
             <h2 class="contact__title">
               Building something, teaching something, or arguing about something?
