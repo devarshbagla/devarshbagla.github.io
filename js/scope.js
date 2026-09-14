@@ -12,9 +12,11 @@
  * Channel B is channel A at a Lissajous ratio through a quarter-period delay, so
  * the X/Y plot traces a real phase figure instead of a straight line.
  *
- * Browsers refuse to start an AudioContext before a user gesture. Until then the
- * scope renders a cold frame captured from an OfflineAudioContext running the same
- * oscillator bank through the same AnalyserNode — still real, just not live.
+ * The trace is driven by a math-generated additive series on load — no
+ * AudioContext, no gesture. After the user interacts we optionally switch the
+ * same buffers over to a silent AnalyserNode so the FFT is real. The rAF loop
+ * always runs while the scope is on screen; the canvas is never left static
+ * except under prefers-reduced-motion, which holds a single frame.
  */
 
 import {
@@ -50,8 +52,9 @@ const IDLE_FREQ = 174;
 const IDLE_AMP = 0.62;
 const IDLE_PARTIALS = 3;
 
-const EASE = 0.09;
-const READOUT_MS = 100;
+const EASE = 0.08;
+const PHOSPHOR = 0.12;
+const SAMPLE_RATE = 44100;
 const DRAG_PX_PER_PARTIAL = 34;
 
 /** Lissajous X:Y ratio for each harmonic count, 1 through 7. */
@@ -205,7 +208,16 @@ export function initScope(root = document) {
   let raf = 0;
   let running = false;
   let onScreen = true;
-  let lastReadout = 0;
+  let lastNow = 0;
+  let signalTime = 0;
+  let displayFreq = IDLE_FREQ;
+  let displayAmp = IDLE_AMP;
+  let displayPeak = IDLE_FREQ;
+  let displayBin = Math.round((IDLE_FREQ * FFT_SIZE) / SAMPLE_RATE);
+
+  const mathTime = new Uint8Array(FFT_SIZE);
+  const mathTimeB = new Uint8Array(FFT_SIZE);
+  const mathFreq = new Uint8Array(FFT_SIZE / 2);
 
   /* ---------------------------------------------------------------- canvas */
 
@@ -265,11 +277,31 @@ export function initScope(root = document) {
     gridCtx.restore();
   }
 
-  function fadeTrace(alpha) {
+  function colorWithAlpha(color, alpha) {
+    const value = (color || "").trim();
+    if (value[0] === "#") {
+      let hex = value.slice(1);
+      if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      }
+      if (hex.length === 6) {
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      }
+    }
+    const rgb = value.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/i);
+    if (rgb) return `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${alpha})`;
+    return `rgba(11, 10, 9, ${alpha})`;
+  }
+
+  function fadeTrace() {
     const { width, height } = cssSize(traceCanvas);
+    const bg = cssVar("--bg", "#0B0A09");
     traceCtx.save();
-    traceCtx.globalCompositeOperation = "destination-out";
-    traceCtx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+    traceCtx.globalCompositeOperation = "source-over";
+    traceCtx.fillStyle = colorWithAlpha(bg, PHOSPHOR);
     traceCtx.fillRect(0, 0, width, height);
     traceCtx.restore();
   }
@@ -333,7 +365,11 @@ export function initScope(root = document) {
   }
 
   function findPeak(freqData, sampleRate) {
-    if (!freqData) return;
+    if (!freqData) {
+      peakHz = freq;
+      peakBin = Math.max(1, Math.round((freq * FFT_SIZE) / sampleRate));
+      return;
+    }
     const binHz = sampleRate / FFT_SIZE;
     const topBin = Math.min(freqData.length, Math.ceil(SPECTRUM_TOP_HZ / binHz));
     let best = 0;
@@ -344,8 +380,42 @@ export function initScope(root = document) {
         bestBin = i;
       }
     }
-    peakBin = bestBin;
-    peakHz = best > 0 ? bestBin * binHz : 0;
+    const nextHz = best > 0 ? bestBin * binHz : freq;
+    peakHz = lerp(peakHz || nextHz, nextHz, EASE);
+    peakBin = bestBin || Math.max(1, Math.round((freq * FFT_SIZE) / sampleRate));
+  }
+
+  function fillMathBuffers() {
+    const ratio = LISSAJOUS_RATIO[partials - 1] || 1;
+    const norm = bankNorm(partials);
+    const dt = 1 / SAMPLE_RATE;
+    for (let i = 0; i < FFT_SIZE; i += 1) {
+      const t = signalTime + i * dt;
+      let a = 0;
+      let b = 0;
+      for (let n = 1; n <= partials; n += 1) {
+        const w = 1 / n;
+        a += Math.sin(Math.PI * 2 * freq * n * t) * w;
+        b += Math.sin(Math.PI * 2 * freq * ratio * n * t) * w;
+      }
+      mathTime[i] = clamp(Math.round(128 + 128 * amp * (a / norm)), 0, 255);
+      mathTimeB[i] = clamp(Math.round(128 + 128 * amp * (b / norm)), 0, 255);
+    }
+
+    mathFreq.fill(0);
+    const binHz = SAMPLE_RATE / FFT_SIZE;
+    for (let n = 1; n <= partials; n += 1) {
+      const hz = freq * n;
+      const bin = hz / binHz;
+      const level = 255 * amp * (1 / n / bankNorm(partials)) * 1.55;
+      const i0 = Math.floor(bin);
+      for (let i = i0 - 2; i <= i0 + 2; i += 1) {
+        if (i <= 0 || i >= mathFreq.length) continue;
+        const w = 1 - Math.abs(i - bin) / 2.2;
+        if (w <= 0) continue;
+        mathFreq[i] = clamp(Math.round(mathFreq[i] + level * w), 0, 255);
+      }
+    }
   }
 
   function drawSpectrum(freqData, sampleRate) {
@@ -535,17 +605,21 @@ export function initScope(root = document) {
 
   function setState() {
     if (!stateEl) return;
-    const live = armed && running;
-    stateEl.textContent = live ? "LIVE" : "IDLE";
-    stateEl.classList.toggle("is-live", live);
+    const live = running || (!prefersReducedMotion() && onScreen);
+    stateEl.textContent = prefersReducedMotion() ? "HOLD" : live ? "LIVE" : "IDLE";
+    stateEl.classList.toggle("is-live", live && !prefersReducedMotion());
   }
 
   function writeReadout() {
     if (!readout) return;
-    const peak = peakHz > 0 ? `${Math.round(peakHz)} Hz · B${peakBin}` : "—";
+    displayFreq = lerp(displayFreq, freq, EASE);
+    displayAmp = lerp(displayAmp, amp, EASE);
+    displayPeak = lerp(displayPeak, peakHz || freq, EASE);
+    displayBin = Math.round(lerp(displayBin, peakBin || displayBin, EASE));
+    const peak = `${Math.round(displayPeak)} Hz · B${Math.max(1, displayBin)}`;
     readout.textContent =
-      `FREQ ${freq.toFixed(1).padStart(5, " ")} Hz` +
-      `   AMP ${amp.toFixed(2)}` +
+      `FREQ ${displayFreq.toFixed(1).padStart(5, " ")} Hz` +
+      `   AMP ${displayAmp.toFixed(2)}` +
       `   HARM ${partials}` +
       `   PEAK ${peak}`;
   }
@@ -564,14 +638,18 @@ export function initScope(root = document) {
 
   function paintCold() {
     clearTrace();
-    if (!cold) {
-      writeReadout();
-      return;
+    if (cold) {
+      findPeak(cold.freq, cold.sampleRate);
+      if (mode === "SPECTRUM") drawSpectrum(cold.freq, cold.sampleRate);
+      else if (mode === "LISSAJOUS") drawLissajous(cold.time, cold.timeB);
+      else drawWaveform(cold.time);
+    } else {
+      fillMathBuffers();
+      findPeak(mathFreq, SAMPLE_RATE);
+      if (mode === "SPECTRUM") drawSpectrum(mathFreq, SAMPLE_RATE);
+      else if (mode === "LISSAJOUS") drawLissajous(mathTime, mathTimeB);
+      else drawWaveform(mathTime);
     }
-    findPeak(cold.freq, cold.sampleRate);
-    if (mode === "SPECTRUM") drawSpectrum(cold.freq, cold.sampleRate);
-    else if (mode === "LISSAJOUS") drawLissajous(cold.time, cold.timeB);
-    else drawWaveform(cold.time);
     writeReadout();
     setState();
   }
@@ -582,37 +660,47 @@ export function initScope(root = document) {
     if (!running) return;
     raf = requestAnimationFrame(tick);
 
+    const dt = lastNow ? Math.min(0.05, (now - lastNow) / 1000) : 1 / 60;
+    lastNow = now;
+    signalTime += dt;
+
     freq = lerp(freq, targetFreq, EASE);
     amp = lerp(amp, targetAmp, EASE);
     pushParams();
 
-    const { analyserA, analyserB, time, timeB, freq: freqData, ctx } = audio;
-    analyserA.getByteTimeDomainData(time);
-    analyserA.getByteFrequencyData(freqData);
-    findPeak(freqData, ctx.sampleRate);
-
-    fadeTrace(mode === "SPECTRUM" ? 0.55 : 0.2);
-
-    if (mode === "SPECTRUM") {
-      drawSpectrum(freqData, ctx.sampleRate);
-    } else if (mode === "LISSAJOUS") {
-      analyserB.getByteTimeDomainData(timeB);
-      drawLissajous(time, timeB);
+    let time = mathTime;
+    let timeB = mathTimeB;
+    let freqData = mathFreq;
+    let rate = SAMPLE_RATE;
+    const useFft = armed && audio && audio.ctx.state === "running";
+    if (useFft) {
+      audio.analyserA.getByteTimeDomainData(audio.time);
+      audio.analyserA.getByteFrequencyData(audio.freq);
+      time = audio.time;
+      freqData = audio.freq;
+      rate = audio.ctx.sampleRate;
+      if (mode === "LISSAJOUS") audio.analyserB.getByteTimeDomainData(audio.timeB);
+      timeB = audio.timeB;
     } else {
-      drawWaveform(time);
+      fillMathBuffers();
     }
 
-    if (now - lastReadout >= READOUT_MS) {
-      lastReadout = now;
-      writeReadout();
-    }
+    findPeak(freqData, rate);
+    fadeTrace();
+
+    if (mode === "SPECTRUM") drawSpectrum(freqData, rate);
+    else if (mode === "LISSAJOUS") drawLissajous(time, timeB);
+    else drawWaveform(time);
+
+    writeReadout();
+    setState();
   }
 
   function start() {
-    if (running || !armed || !onScreen || document.hidden) return;
+    if (running || !onScreen || document.hidden) return;
     if (prefersReducedMotion()) return;
     running = true;
-    lastReadout = 0;
+    lastNow = 0;
     if (audio && audio.ctx.state === "suspended") audio.ctx.resume().catch(() => {});
     raf = requestAnimationFrame(tick);
     setState();
@@ -632,7 +720,7 @@ export function initScope(root = document) {
       refreshCold();
       return;
     }
-    if (armed && onScreen && !document.hidden) start();
+    if (onScreen && !document.hidden) start();
     else stop();
   }
 
@@ -654,6 +742,7 @@ export function initScope(root = document) {
     clearTrace();
     if (!armed || prefersReducedMotion()) paintCold();
     if (announceChange) announce(`Mode ${mode.toLowerCase()}.`);
+    if (!running && !prefersReducedMotion()) start();
   }
 
   function describeMode() {
@@ -804,12 +893,18 @@ export function initScope(root = document) {
   const ro = new ResizeObserver(resizeDebounced);
   ro.observe(frame);
 
+  let ioConfirmed = false;
   const io = new IntersectionObserver(
     (entries) => {
-      onScreen = entries.some((entry) => entry.isIntersecting);
+      const visible = entries.some((entry) => entry.isIntersecting && entry.intersectionRatio > 0);
+      if (visible) ioConfirmed = true;
+      // First paint is often a 0-height miss; keep running until we have
+      // actually seen the scope on screen once.
+      if (!ioConfirmed) return;
+      onScreen = visible;
       syncLoop();
     },
-    { threshold: 0.02 }
+    { threshold: 0, rootMargin: "80px" }
   );
   io.observe(host);
 
@@ -838,9 +933,15 @@ export function initScope(root = document) {
   setMode(mode, { announceChange: false });
   writeReadout();
   setState();
-  coldCapture({ freq, amp, partials }).then((data) => {
-    cold = data;
-    if (!armed) paintCold();
-  });
-  if (!prefersReducedMotion()) watchForActivation();
+  if (prefersReducedMotion()) {
+    fillMathBuffers();
+    paintCold();
+    coldCapture({ freq, amp, partials }).then((data) => {
+      cold = data;
+      if (prefersReducedMotion()) paintCold();
+    });
+  } else {
+    watchForActivation();
+    start();
+  }
 }

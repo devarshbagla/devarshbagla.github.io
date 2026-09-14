@@ -80,7 +80,7 @@
   background: color-mix(in srgb, var(--surface-2) 80%, transparent);
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1280px) {
   .site-nav__link {
     padding-inline: var(--space-2);
   }

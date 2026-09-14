@@ -211,6 +211,7 @@
         <div class="site-header__actions">
           <nav class="site-nav" data-site-nav aria-label="Primary">
             <ul class="site-nav__list" id="primary-nav-list">
+              <li><a class="site-nav__link" href="#about">About</a></li>
               <li><a class="site-nav__link" href="#now">Now</a></li>
               <li><a class="site-nav__link" href="#work">Work</a></li>
               <li><a class="site-nav__link" href="#projects">Projects</a></li>
@@ -253,6 +254,13 @@
       </div>
     </header>
 
+    <!--
+      Section numbers must stay sequential in DOM order.
+      Current list: 01 ABOUT, 02 NOW, 03 WORK, 04 PROJECTS, 05 RESEARCH,
+      06 TEACHING, 07 WORKBENCH, 08 STACK, 09 CONTACT.
+      Inserted sections take the next number in place and everything after
+      them shifts so the rendered labels never scramble again.
+    -->
     <main id="main" tabindex="-1">
       <section id="hero" class="hero" aria-label="Hero">
         <div class="container hero__grid">
@@ -326,7 +334,7 @@
 
       <section id="about" class="section about" aria-labelledby="about-heading">
         <div class="container">
-          <p class="section__label" id="about-heading" data-reveal>01 / About</p>
+          <p class="section__label" id="about-heading" data-reveal>01 / ABOUT</p>
           <div class="about__grid">
             <div class="about__prose" data-reveal>
               <p>
@@ -395,7 +403,7 @@
       <!-- Update the LAST UPDATED stamp (and the copy) whenever this paragraph changes. -->
       <section id="now" class="section now" aria-labelledby="now-heading">
         <div class="container">
-          <p class="section__label" id="now-heading" data-reveal>08 / NOW</p>
+          <p class="section__label" id="now-heading" data-reveal>02 / NOW</p>
           <p class="now__updated" data-reveal>
             <span class="now__updated-key">LAST UPDATED</span>
             <time datetime="2026-09-14">14 SEP 2026</time>
@@ -415,7 +423,7 @@
 
       <section id="work" class="section work" aria-labelledby="work-heading">
         <div class="container">
-          <p class="section__label" id="work-heading" data-reveal>02 / WORK</p>
+          <p class="section__label" id="work-heading" data-reveal>03 / WORK</p>
           <div class="work__list">
             <article class="work-card" data-reveal tabindex="0" data-work-card>
               <div class="work-card__header">
@@ -457,7 +465,7 @@
 
       <section id="projects" class="section projects" aria-labelledby="projects-heading">
         <div class="container">
-          <p class="section__label" id="projects-heading" data-reveal>03 / PROJECTS</p>
+          <p class="section__label" id="projects-heading" data-reveal>04 / PROJECTS</p>
           <div class="projects__grid">
 
             <article class="project-card" id="project-deskpulse" data-reveal tabindex="0" data-project-card>
@@ -720,7 +728,7 @@
       </section>
       <section id="research" class="section research" aria-labelledby="research-heading">
         <div class="container">
-          <p class="section__label" id="research-heading" data-reveal>04 / RESEARCH</p>
+          <p class="section__label" id="research-heading" data-reveal>05 / RESEARCH</p>
 
           <article class="research-paper" data-reveal>
             <header class="research-paper__header">
@@ -925,7 +933,7 @@
 
       <section id="teaching" class="section teaching" aria-labelledby="teaching-heading">
         <div class="container">
-          <p class="section__label" id="teaching-heading" data-reveal>05 / TEACHING AND COMMUNITY</p>
+          <p class="section__label" id="teaching-heading" data-reveal>06 / TEACHING AND COMMUNITY</p>
 
           <ol class="timeline" data-reveal>
             <li class="timeline__item">
@@ -997,7 +1005,7 @@
 
       <section id="workbench" class="section workbench" aria-labelledby="workbench-heading">
         <div class="container">
-          <p class="section__label" id="workbench-heading" data-reveal>06 / THE WORKBENCH</p>
+          <p class="section__label" id="workbench-heading" data-reveal>07 / THE WORKBENCH</p>
           <p class="workbench__lede" data-reveal>
             Most CS students cannot draw. Most designers cannot program. This is the loop I am trying to close.
           </p>
@@ -1015,7 +1023,7 @@
 
       <section id="stack" class="section stack" aria-labelledby="stack-heading">
         <div class="container">
-          <p class="section__label" id="stack-heading" data-reveal>09 / STACK</p>
+          <p class="section__label" id="stack-heading" data-reveal>08 / STACK</p>
           <p class="stack__lede" data-reveal>
             What I actually use, grouped honestly. Hover or focus a chip for depth.
             Nothing here is claimed beyond what I have done with it.
@@ -1083,7 +1091,7 @@
 
       <section id="contact" class="section contact" aria-labelledby="contact-heading">
         <div class="container">
-          <p class="section__label" id="contact-heading" data-reveal>07 / CONTACT</p>
+          <p class="section__label" id="contact-heading" data-reveal>09 / CONTACT</p>
           <div class="contact__inner" data-reveal>
             <h2 class="contact__title">
               Building something, teaching something, or arguing about something?

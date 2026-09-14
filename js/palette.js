@@ -12,6 +12,7 @@ const GITHUB = "https://github.com/devarshbagla";
 const LINKEDIN = "https://www.linkedin.com/in/devarshbagla";
 
 const COMMANDS = [
+  { id: "sec-about", category: "Sections", label: "About", keywords: "about bio", action: { type: "scroll", target: "#about" } },
   { id: "sec-now", category: "Sections", label: "Now", keywords: "now cad lm studio gpu", action: { type: "scroll", target: "#now" } },
   { id: "sec-work", category: "Sections", label: "Work", keywords: "work experience bees", action: { type: "scroll", target: "#work" } },
   { id: "sec-projects", category: "Sections", label: "Projects", keywords: "projects", action: { type: "scroll", target: "#projects" } },

@@ -128,7 +128,7 @@ document.documentElement.setAttribute("data-hydrated", "true");
 initTheme();
 initHeaderScroll();
 initMobileNav();
-whenNear(document.querySelector("[data-scope]"), () => initScope());
+initScope();
 initReveal();
 initScrollProgress();
 initDeskPulse();
