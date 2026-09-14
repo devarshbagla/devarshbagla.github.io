@@ -9,6 +9,8 @@ import { initTerminal } from "./terminal.js";
 import { initPalette } from "./palette.js";
 import { initContact } from "./contact.js";
 import { initScrollSpy, initMagnetic, initScramble } from "./nav.js";
+import { initPerfHud } from "./perf.js";
+import { whenNear } from "./util.js";
 
 function initHeaderScroll() {
   const header = document.querySelector("[data-site-header]");
@@ -125,12 +127,12 @@ document.documentElement.setAttribute("data-hydrated", "true");
 initTheme();
 initHeaderScroll();
 initMobileNav();
-initScope();
+whenNear(document.querySelector("[data-scope]"), () => initScope());
 initReveal();
 initScrollProgress();
 initDeskPulse();
 initProjectCards();
-initResearchChart();
+whenNear(document.querySelector("[data-research-chart]"), () => initResearchChart());
 initChurn();
 initWorkbench();
 initTerminal();
@@ -139,3 +141,21 @@ initContact();
 initScramble();
 initScrollSpy();
 initMagnetic();
+initPerfHud();
+registerServiceWorker();
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  const host = location.hostname;
+  if (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "[::1]" ||
+    location.protocol === "file:"
+  ) {
+    return;
+  }
+  navigator.serviceWorker.register("./sw.js").catch(() => {
+    /* private mode, blocked, or file served without the worker */
+  });
+}

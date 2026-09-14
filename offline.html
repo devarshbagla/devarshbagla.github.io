@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Offline — Devarsh Bagla</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0B0A09">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sections.css">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem("theme");
+        var theme = (stored === "light" || stored === "dark")
+          ? stored
+          : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
+  <style>
+    .offline {
+      min-height: calc(100svh - var(--header-h));
+      display: grid;
+      place-items: center;
+      padding: var(--space-10) var(--gutter);
+      text-align: center;
+    }
+    .offline__code {
+      margin: 0 0 var(--space-4);
+      font-family: var(--font-mono);
+      font-size: var(--step--1);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .offline__title {
+      margin: 0 0 var(--space-4);
+      font-family: var(--font-display);
+      font-size: var(--step-4);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+    .offline__body {
+      margin: 0 auto var(--space-7);
+      max-width: 40ch;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <main class="offline">
+    <div>
+      <p class="offline__code">OFFLINE</p>
+      <h1 class="offline__title">The workbench is on this machine, the network is not.</h1>
+      <p class="offline__body">
+        Cached pages still open. Anything that has not been visited yet will
+        have to wait until you are back online.
+      </p>
+      <a class="btn btn--primary" href="./">Back home</a>
+    </div>
+  </main>
+</body>
+</html>

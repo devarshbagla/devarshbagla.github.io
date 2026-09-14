@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Devarsh Bagla">
+  <rect width="512" height="512" fill="#0B0A09"/>
+  <path
+    d="M96 256h32l24-80 36 160 36-208 36 208 36-128 36 96 36-48h48"
+    fill="none"
+    stroke="#e2703a"
+    stroke-width="24"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

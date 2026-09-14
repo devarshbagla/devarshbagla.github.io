@@ -4,6 +4,7 @@
 
 import { toggleTheme } from "./theme.js";
 import { openTerminal } from "./terminal.js";
+import { togglePerfHud } from "./perf.js";
 
 const EMAIL = "devarshbagla@gmail.com";
 const PAPER_DOI = "https://dx.doi.org/10.70729/SE251005174007";
@@ -35,6 +36,7 @@ const COMMANDS = [
   { id: "act-linkedin", category: "Actions", label: "Open LinkedIn", keywords: "linkedin", action: { type: "open", url: LINKEDIN } },
   { id: "act-paper", category: "Actions", label: "Read the paper", keywords: "doi research churn", action: { type: "open", url: PAPER_DOI } },
   { id: "act-terminal", category: "Actions", label: "Open terminal", keywords: "shell console konami", action: { type: "terminal" } },
+  { id: "act-perf", category: "Actions", label: "Toggle perf HUD", keywords: "fps memory performance hud", action: { type: "perf" } },
 ];
 
 function fuzzyScore(query, text) {
@@ -99,6 +101,9 @@ function runAction(action) {
       break;
     case "terminal":
       openTerminal();
+      break;
+    case "perf":
+      togglePerfHud();
       break;
     default:
       break;
