@@ -1,14 +1,52 @@
 /**
  * Scroll system — reveal-on-intersect + top progress bar.
+ *
+ * Where the browser supports scroll-driven CSS animations the reveal is handed
+ * to `animation-timeline: view()` and no JavaScript observer runs. That timeline
+ * is inactive when the document cannot scroll, which would strand every element
+ * at opacity 0, so the CSS path is only armed once there is something to scroll.
  */
+
+const SCROLL_REVEAL_CLASS = "has-scroll-reveal";
+const MIN_SCROLLABLE = 240;
+
+function hasScrollTimeline() {
+  return (
+    typeof CSS !== "undefined" &&
+    typeof CSS.supports === "function" &&
+    CSS.supports("animation-timeline", "view()")
+  );
+}
+
+function scrollableDistance() {
+  const doc = document.documentElement;
+  return doc.scrollHeight - doc.clientHeight;
+}
 
 export function initReveal(root = document) {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   const nodes = Array.from(root.querySelectorAll("[data-reveal]"));
   if (!nodes.length) return;
 
+  const revealAll = () => nodes.forEach((el) => el.classList.add("is-revealed"));
+
   if (reduced.matches || !("IntersectionObserver" in window)) {
-    nodes.forEach((el) => el.classList.add("is-revealed"));
+    revealAll();
+    return;
+  }
+
+  if (hasScrollTimeline() && scrollableDistance() > MIN_SCROLLABLE) {
+    document.documentElement.classList.add(SCROLL_REVEAL_CLASS);
+    // A window that grows taller than the content kills the timeline; bail out.
+    window.addEventListener(
+      "resize",
+      () => {
+        if (scrollableDistance() > MIN_SCROLLABLE) return;
+        document.documentElement.classList.remove(SCROLL_REVEAL_CLASS);
+        revealAll();
+      },
+      { passive: true }
+    );
     return;
   }
 

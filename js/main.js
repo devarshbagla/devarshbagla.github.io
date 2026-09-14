@@ -8,6 +8,7 @@ import { initWorkbench } from "./workbench.js";
 import { initTerminal } from "./terminal.js";
 import { initPalette } from "./palette.js";
 import { initContact } from "./contact.js";
+import { initScrollSpy, initMagnetic, initScramble } from "./nav.js";
 
 function initHeaderScroll() {
   const header = document.querySelector("[data-site-header]");
@@ -135,3 +136,6 @@ initWorkbench();
 initTerminal();
 initPalette();
 initContact();
+initScramble();
+initScrollSpy();
+initMagnetic();

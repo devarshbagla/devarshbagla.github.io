@@ -25,15 +25,38 @@ export function getTheme() {
   return document.documentElement.getAttribute("data-theme") || "dark";
 }
 
-export function setTheme(theme) {
-  const next = theme === "light" ? "light" : "dark";
+function applyTheme(next) {
   document.documentElement.setAttribute("data-theme", next);
+  const meta = document.querySelector('meta[name="theme-color"]:not([media])');
+  if (meta) meta.setAttribute("content", next === "light" ? "#F7F3EC" : "#0B0A09");
   try {
     localStorage.setItem(STORAGE_KEY, next);
   } catch {
     /* ignore */
   }
   syncToggle(next);
+}
+
+function reducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+export function setTheme(theme) {
+  const next = theme === "light" ? "light" : "dark";
+  if (next === document.documentElement.getAttribute("data-theme")) {
+    applyTheme(next);
+    return;
+  }
+  // Cross-fade the whole document where the browser can; plain swap elsewhere.
+  if (typeof document.startViewTransition === "function" && !reducedMotion()) {
+    document.documentElement.classList.add("is-theme-transition");
+    const transition = document.startViewTransition(() => applyTheme(next));
+    transition.finished
+      .catch(() => {})
+      .finally(() => document.documentElement.classList.remove("is-theme-transition"));
+    return;
+  }
+  applyTheme(next);
 }
 
 export function toggleTheme() {

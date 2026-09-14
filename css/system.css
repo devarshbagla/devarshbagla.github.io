@@ -1,0 +1,206 @@
+/* System — scroll-spy, section rail, view transitions, magnetics, scramble */
+
+/* —— Nav scroll-spy + FLIP underline —— */
+.site-nav__list {
+  position: relative;
+}
+
+.site-nav__link.is-current {
+  color: var(--accent);
+}
+
+.site-nav__underline {
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  height: 1.5px;
+  width: 0;
+  border-radius: 1px;
+  background: var(--accent);
+  transform-origin: left center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.site-nav__underline.is-visible {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .site-nav__underline {
+    display: none;
+  }
+}
+
+/* —— Right-edge section rail —— */
+.rail {
+  position: fixed;
+  top: 50%;
+  right: clamp(0.75rem, 2vw, 1.75rem);
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3);
+  transform: translateY(-50%);
+}
+
+.rail__dot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 1.5rem;
+  height: 1rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.rail__dot::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--ink-muted);
+  opacity: 0.45;
+  transition:
+    width 260ms var(--ease-spring),
+    height 200ms var(--ease-out),
+    background-color 200ms var(--ease-out),
+    opacity 200ms var(--ease-out);
+}
+
+.rail__dot:hover::after,
+.rail__dot:focus-visible::after {
+  opacity: 1;
+  background: var(--ink);
+}
+
+.rail__dot.is-current::after {
+  width: 16px;
+  opacity: 1;
+  background: var(--accent);
+}
+
+.rail__dot:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.rail__label {
+  position: absolute;
+  right: calc(100% + 0.5rem);
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(4px);
+  pointer-events: none;
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 220ms var(--ease-out);
+}
+
+.rail__dot:hover .rail__label,
+.rail__dot:focus-visible .rail__label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 1000px) {
+  .rail {
+    display: none;
+  }
+}
+
+body.palette-open .rail,
+body.terminal-open .rail,
+body.nav-open .rail {
+  display: none;
+}
+
+/* —— Magnetic primary buttons —— */
+.btn {
+  transform: translate(var(--mx, 0px), var(--my, 0px)) scale(var(--press, 1));
+}
+
+.btn:active {
+  --press: 0.98;
+}
+
+.btn.is-magnet {
+  transition:
+    color 180ms var(--ease-out),
+    background-color 180ms var(--ease-out),
+    border-color 180ms var(--ease-out),
+    transform 110ms linear;
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none) {
+  .btn {
+    --mx: 0px;
+    --my: 0px;
+  }
+}
+
+/* —— View Transitions for the theme swap —— */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* The scope canvases repaint on the next frame; freeze them during the fade. */
+.is-theme-transition .scope__trace {
+  opacity: 0.999;
+}
+
+/* —— Scroll-driven reveals, with the IntersectionObserver path as fallback —— */
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .has-scroll-reveal [data-reveal] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 24%;
+    }
+  }
+}
+
+/* —— Section heading scramble —— */
+.section__label > span[aria-hidden="true"] {
+  display: inline-block;
+  min-width: 1ch;
+}
