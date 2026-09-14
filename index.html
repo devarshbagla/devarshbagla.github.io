@@ -659,6 +659,140 @@
               </p>
             </div>
 
+            <div class="churn" data-churn data-reveal>
+              <div class="churn__tabs" role="tablist" aria-label="Churn model explorers">
+                <button
+                  type="button"
+                  class="churn__tab is-active"
+                  role="tab"
+                  id="churn-tab-predict"
+                  aria-controls="churn-panel-predict"
+                  aria-selected="true"
+                >PREDICTOR</button>
+                <button
+                  type="button"
+                  class="churn__tab"
+                  role="tab"
+                  id="churn-tab-matrix"
+                  aria-controls="churn-panel-matrix"
+                  aria-selected="false"
+                  tabindex="-1"
+                >CONFUSION MATRIX</button>
+              </div>
+
+              <p class="churn__disclaimer">
+                Illustrative model with representative coefficients, not the trained
+                weights from the paper. It runs logistic regression in your browser so
+                the shape of the decision is explorable; the published results came from
+                WEKA on the real 64,374-record dataset.
+              </p>
+
+              <div
+                class="churn__panel"
+                role="tabpanel"
+                id="churn-panel-predict"
+                aria-labelledby="churn-tab-predict"
+                tabindex="0"
+              >
+                <div class="churn__split">
+                  <div class="churn__inputs">
+                    <div class="dsp__grid">
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="cx-tenure">TENURE</label>
+                        <input class="dsp__range" id="cx-tenure" type="range" min="1" max="60" step="1" value="24" data-churn-input="tenure">
+                        <output class="dsp__value" for="cx-tenure" data-churn-out="tenure">24 mo</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="cx-calls">SUPPORT CALLS</label>
+                        <input class="dsp__range" id="cx-calls" type="range" min="0" max="12" step="1" value="4" data-churn-input="calls">
+                        <output class="dsp__value" for="cx-calls" data-churn-out="calls">4</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="cx-delay">PAYMENT DELAY</label>
+                        <input class="dsp__range" id="cx-delay" type="range" min="0" max="30" step="1" value="12" data-churn-input="delay">
+                        <output class="dsp__value" for="cx-delay" data-churn-out="delay">12 d</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="cx-spend">TOTAL SPEND</label>
+                        <input class="dsp__range" id="cx-spend" type="range" min="100" max="1200" step="10" value="600" data-churn-input="spend">
+                        <output class="dsp__value" for="cx-spend" data-churn-out="spend">600</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="cx-recency">LAST CONTACT</label>
+                        <input class="dsp__range" id="cx-recency" type="range" min="0" max="30" step="1" value="12" data-churn-input="recency">
+                        <output class="dsp__value" for="cx-recency" data-churn-out="recency">12 d</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="cx-usage">USAGE FREQ</label>
+                        <input class="dsp__range" id="cx-usage" type="range" min="1" max="30" step="1" value="16" data-churn-input="usage">
+                        <output class="dsp__value" for="cx-usage" data-churn-out="usage">16 /mo</output>
+                      </div>
+                      <div class="dsp__row">
+                        <label class="dsp__label" for="cx-contract">CONTRACT</label>
+                        <select class="churn__select" id="cx-contract" data-churn-contract>
+                          <option value="monthly" selected>Monthly</option>
+                          <option value="quarterly">Quarterly</option>
+                          <option value="annual">Annual</option>
+                        </select>
+                        <span class="dsp__value" aria-hidden="true"></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="churn__result">
+                    <div class="churn__gauge" data-churn-gauge></div>
+                    <p class="churn__logit" data-churn-logit aria-hidden="true"></p>
+                  </div>
+                </div>
+
+                <div class="churn__contrib">
+                  <p class="dsp__legend" id="churn-contrib-label">
+                    Contribution to log-odds, largest first
+                  </p>
+                  <ul class="contrib" data-churn-contrib aria-labelledby="churn-contrib-label"></ul>
+                  <p class="churn__key" aria-hidden="true">
+                    <span class="churn__key-item churn__key-item--up">POSITIVE PUSHES TOWARD CHURN</span>
+                    <span class="churn__key-item churn__key-item--down">NEGATIVE HOLDS THEM</span>
+                  </p>
+                </div>
+
+                <p class="visually-hidden" data-churn-status role="status" aria-live="polite"></p>
+              </div>
+
+              <div
+                class="churn__panel"
+                role="tabpanel"
+                id="churn-panel-matrix"
+                aria-labelledby="churn-tab-matrix"
+                tabindex="0"
+                hidden
+              >
+                <p class="churn__lede">
+                  The same illustrative model scored against a synthetic 2,000-customer
+                  sample. Move the decision threshold and watch what you trade away.
+                </p>
+
+                <div class="dsp__row churn__threshold">
+                  <label class="dsp__label" for="cx-threshold">THRESHOLD</label>
+                  <input class="dsp__range" id="cx-threshold" type="range" min="0" max="1" step="0.01" value="0.5" data-churn-threshold>
+                  <output class="dsp__value" for="cx-threshold" data-churn-threshold-out>0.50</output>
+                </div>
+
+                <div class="churn__hist" data-churn-hist></div>
+                <div class="churn__matrix" data-churn-matrix></div>
+
+                <dl class="churn__metrics" data-churn-metrics>
+                  <div><dt>Precision</dt><dd data-churn-metric="precision">—</dd></div>
+                  <div><dt>Recall</dt><dd data-churn-metric="recall">—</dd></div>
+                  <div><dt>F1</dt><dd data-churn-metric="f1">—</dd></div>
+                  <div><dt>Accuracy</dt><dd data-churn-metric="accuracy">—</dd></div>
+                </dl>
+
+                <p class="churn__hintline" data-churn-tradeoff></p>
+                <p class="visually-hidden" data-churn-matrix-status role="status" aria-live="polite"></p>
+              </div>
+            </div>
+
             <aside class="research-note" data-reveal>
               <p class="research-note__label">Method note</p>
               <p class="research-note__body">
