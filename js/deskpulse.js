@@ -6,7 +6,7 @@
  * numbers the sliders expose, and the envelope canvas is drawn from those same
  * numbers — what you see is exactly what is scheduled.
  *
- *   osc(sine, freq) -> lowpass(cutoff) -> gain(attack/decay envelope) -> master
+ *   osc(wave, freq) -> lowpass(cutoff) -> gain(attack/decay envelope) -> master
  */
 
 import {
@@ -113,10 +113,16 @@ function mountDeskPulse(host) {
   let raf = 0;
   let playStart = 0;
 
-  let params = readParams();
-  let envelope = buildEnvelope(params);
+  const WAVES = ["sine", "triangle", "square"];
+  const waveBtns = Array.from(host.querySelectorAll("[data-dsp-wave]"));
+  const bandEl = host.querySelector("[data-dsp-band]");
+  let wave = "sine";
 
-  /* ----------------------------------------------------------- parameters */
+  function bandCopy(hz) {
+    if (hz < 90) return "mostly felt, nearly inaudible";
+    if (hz <= 150) return "felt and faintly heard, the useful band";
+    return "increasingly audible, less tactile";
+  }
 
   function readParams() {
     const next = {};
@@ -124,14 +130,18 @@ function mountDeskPulse(host) {
       next[input.dataset.dspParam] = Number(input.value);
     });
     return {
-      freq: next.freq ?? 55,
+      freq: next.freq ?? 125,
       bursts: next.bursts ?? 3,
       spacing: next.spacing ?? 90,
       attack: next.attack ?? 8,
       decay: next.decay ?? 180,
       cutoff: next.cutoff ?? 120,
+      wave,
     };
   }
+
+  let params = readParams();
+  let envelope = buildEnvelope(params);
 
   function syncOutputs() {
     ranges.forEach((input) => {
@@ -146,6 +156,12 @@ function mountDeskPulse(host) {
         "--fill",
         `${((value - Number(input.min)) / (Number(input.max) - Number(input.min))) * 100}%`
       );
+    });
+    if (bandEl) bandEl.textContent = bandCopy(Number(host.querySelector("[data-dsp-param=freq]")?.value || 125));
+    waveBtns.forEach((btn) => {
+      const on = btn.dataset.dspWave === wave;
+      btn.setAttribute("aria-checked", on ? "true" : "false");
+      btn.classList.toggle("is-active", on);
     });
   }
 
@@ -268,7 +284,7 @@ function mountDeskPulse(host) {
     const filter = ctx.createBiquadFilter();
     const gain = ctx.createGain();
 
-    osc.type = "sine";
+    osc.type = WAVES.includes(p.wave) ? p.wave : "sine";
     osc.frequency.value = p.freq;
 
     filter.type = "lowpass";
@@ -397,6 +413,29 @@ function mountDeskPulse(host) {
       }
     });
   }
+
+  function setWave(next) {
+    if (!WAVES.includes(next)) return;
+    wave = next;
+    refresh();
+    announce(`${wave} waveform.`);
+  }
+
+  waveBtns.forEach((btn, index) => {
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setWave(btn.dataset.dspWave);
+    });
+    btn.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+      event.preventDefault();
+      const dir = event.key === "ArrowRight" ? 1 : -1;
+      const next = (index + dir + waveBtns.length) % waveBtns.length;
+      waveBtns[next].focus();
+      setWave(waveBtns[next].dataset.dspWave);
+    });
+  });
 
   ranges.forEach((input) => {
     input.addEventListener("input", (event) => {

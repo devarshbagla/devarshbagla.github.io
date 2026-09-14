@@ -524,7 +524,8 @@
                 <canvas class="deskpulse__canvas" data-deskpulse-canvas aria-hidden="true"></canvas>
 
                 <p class="deskpulse__warn">
-                  Laptop speakers, volume up. Headphones will not work.
+                  Laptop speakers, volume at 100%. Headphones will not work, and neither will
+                  a Bluetooth speaker. Rest your palms on the deck.
                 </p>
                 <p class="deskpulse__note" data-deskpulse-note>
                   There is no way for a web page to tell what you are listening on, so
@@ -548,8 +549,17 @@
                     <div class="dsp__grid" role="group" aria-labelledby="dsp-params-label">
                       <div class="dsp__row">
                         <label class="dsp__label" for="dp-freq">BASE FREQ</label>
-                        <input class="dsp__range" id="dp-freq" type="range" min="30" max="120" step="1" value="55" data-dsp-param="freq">
-                        <output class="dsp__value" for="dp-freq" data-dsp-out="freq">55 Hz</output>
+                        <input class="dsp__range" id="dp-freq" type="range" min="30" max="220" step="1" value="125" data-dsp-param="freq">
+                        <output class="dsp__value" for="dp-freq" data-dsp-out="freq">125 Hz</output>
+                      </div>
+                      <p class="dsp__band" data-dsp-band aria-live="polite">felt and faintly heard, the useful band</p>
+                      <div class="dsp__row">
+                        <span class="dsp__label" id="dp-wave-label">WAVEFORM</span>
+                        <div class="dsp__waves" role="radiogroup" aria-labelledby="dp-wave-label">
+                          <button type="button" class="chip" role="radio" aria-checked="true" data-dsp-wave="sine">SINE</button>
+                          <button type="button" class="chip" role="radio" aria-checked="false" data-dsp-wave="triangle">TRIANGLE</button>
+                          <button type="button" class="chip" role="radio" aria-checked="false" data-dsp-wave="square">SQUARE</button>
+                        </div>
                       </div>
                       <div class="dsp__row">
                         <label class="dsp__label" for="dp-bursts">BURSTS</label>
@@ -582,13 +592,28 @@
                   <details class="dsp__why">
                     <summary>Why this works</summary>
                     <p>
-                      To reproduce a low frequency at the same loudness as a high one, a
-                      voice coil has to travel much further. Below about 60 Hz a laptop's
-                      driver is too small to move enough air to be heard properly, so most
-                      of that energy goes into physically shaking the driver assembly and,
-                      through its mounting, the chassis your hands are resting on. DeskPulse
-                      leans on that failure: short, steep, low-frequency bursts behind a
-                      lowpass filter, tuned so the desk moves rather than the air.
+                      A speaker makes sound by moving air. To produce the same loudness at a low
+                      frequency as at a high one, the cone has to travel dramatically further,
+                      because the air it displaces per cycle scales with the cube of the wavelength.
+                      A laptop driver is roughly 20mm across with under a millimetre of usable
+                      excursion, so below about 150 Hz it physically cannot displace enough air to
+                      be heard properly.
+                    </p>
+                    <p>
+                      That energy does not disappear. Newton's third law still applies: the voice
+                      coil pushing the cone forward pushes the magnet assembly backward with equal
+                      force. In a large speaker that reaction is absorbed by a heavy cabinet. In a
+                      laptop the driver is screwed directly to a thin aluminium shell with almost no
+                      mass to absorb it, so the reaction force travels straight into the chassis.
+                      The result is a body you feel rather than a sound you hear, and the frame
+                      becomes the transducer.
+                    </p>
+                    <p>
+                      DeskPulse aims at that band deliberately: short bursts with a steep attack
+                      around 125 Hz, filtered so almost nothing above the fundamental survives. The
+                      steep attack matters as much as the frequency, because human mechanoreceptors
+                      in the palm respond to rate of change, not to sustained pressure. A slow swell
+                      at the same amplitude is barely noticeable. A 6ms onset is unmistakable.
                     </p>
                   </details>
 
