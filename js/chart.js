@@ -169,6 +169,7 @@ export function initResearchChart(root = document) {
         rect.setAttribute("ry", "1.5");
         rect.setAttribute("fill", color);
         rect.setAttribute("class", "research-chart__bar");
+        rect.setAttribute("role", "img");
         rect.setAttribute("tabindex", "0");
         rect.setAttribute(
           "aria-label",

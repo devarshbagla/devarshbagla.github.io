@@ -58,6 +58,10 @@
   border: 1px solid var(--accent);
 }
 
+[data-theme="light"] .btn--primary {
+  color: #ffffff;
+}
+
 .btn--primary:hover {
   background: color-mix(in srgb, var(--accent) 88%, white);
   border-color: color-mix(in srgb, var(--accent) 88%, white);
