@@ -29,11 +29,12 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap">
 
-  <link rel="stylesheet" href="/css/tokens.css">
-  <link rel="stylesheet" href="/css/base.css">
-  <link rel="stylesheet" href="/css/layout.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/sections.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sections.css">
 
   <!-- Prevent flash of wrong theme before CSS/JS hydrate -->
   <script>
@@ -88,7 +89,7 @@
   <div class="site">
     <header class="site-header" data-site-header>
       <div class="container site-header__inner">
-        <a class="site-logo" href="/">Devarsh Bagla</a>
+        <a class="site-logo" href="./">Devarsh Bagla</a>
 
         <div class="site-header__actions">
           <nav class="site-nav" data-site-nav aria-label="Primary">
@@ -97,6 +98,7 @@
               <li><a class="site-nav__link" href="#projects">Projects</a></li>
               <li><a class="site-nav__link" href="#research">Research</a></li>
               <li><a class="site-nav__link" href="#teaching">Teaching</a></li>
+              <li><a class="site-nav__link" href="#workbench">Workbench</a></li>
               <li><a class="site-nav__link" href="#contact">Contact</a></li>
             </ul>
           </nav>
@@ -627,9 +629,133 @@
         </div>
       </section>
 
-      <section id="workbench" aria-label="Workbench"></section>
-      <section id="contact" aria-label="Contact"></section>
+      <section id="workbench" class="section workbench" aria-labelledby="workbench-heading">
+        <div class="container">
+          <p class="section__label" id="workbench-heading" data-reveal>06 / THE WORKBENCH</p>
+          <p class="workbench__lede" data-reveal>
+            Most CS students cannot draw. Most designers cannot program. This is the loop I am trying to close.
+          </p>
+          <div class="workbench" data-workbench data-reveal>
+            <div class="workbench__stage">
+              <div class="workbench__svg-host" data-workbench-svg></div>
+            </div>
+            <p class="workbench__caption" data-workbench-caption>
+              Hover or focus a node to read the caption.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="section contact" aria-labelledby="contact-heading">
+        <div class="container">
+          <p class="section__label" id="contact-heading" data-reveal>07 / CONTACT</p>
+          <div class="contact__inner" data-reveal>
+            <h2 class="contact__title">
+              Building something, teaching something, or arguing about something?
+            </h2>
+            <p class="contact__body">
+              I'm most interested in hardware-adjacent software, AI tooling, and
+              anything that involves teaching people to build. Email is the fastest way to
+              reach me.
+            </p>
+            <div class="contact__email-row">
+              <a class="contact__email" href="mailto:devarshbagla@gmail.com">devarshbagla@gmail.com</a>
+              <button type="button" class="btn btn--ghost contact__copy" data-copy-email>
+                Copy
+              </button>
+            </div>
+            <div class="contact__cards">
+              <a
+                class="contact-card"
+                href="https://github.com/devarshbagla"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span class="contact-card__label">GitHub</span>
+                <span class="contact-card__meta">code and experiments</span>
+              </a>
+              <a
+                class="contact-card"
+                href="https://www.linkedin.com/in/devarshbagla"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span class="contact-card__label">LinkedIn</span>
+                <span class="contact-card__meta">work history</span>
+              </a>
+              <a
+                class="contact-card"
+                href="https://dx.doi.org/10.70729/SE251005174007"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span class="contact-card__label">Published paper</span>
+                <span class="contact-card__meta">DOI · churn prediction</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
+
+    <button
+      type="button"
+      class="palette-hint"
+      data-palette-hint
+      aria-label="Open command palette"
+      title="Open command palette (⌘K)"
+    >⌘K</button>
+
+    <div class="palette" data-palette hidden>
+      <div class="palette__backdrop" data-palette-backdrop></div>
+      <div
+        class="palette__panel"
+        data-palette-panel
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
+      >
+        <label class="visually-hidden" for="palette-input">Filter commands</label>
+        <input
+          id="palette-input"
+          class="palette__input"
+          type="search"
+          data-palette-input
+          placeholder="Jump to a section, project, or action…"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <div class="palette__list" data-palette-list role="listbox" aria-label="Results"></div>
+      </div>
+    </div>
+
+    <div class="terminal" data-terminal hidden>
+      <div
+        class="terminal__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Terminal"
+      >
+        <div class="terminal__chrome">
+          <span class="terminal__title">devarsh@workbench:~</span>
+          <button type="button" class="terminal__close" data-terminal-close aria-label="Close terminal">×</button>
+        </div>
+        <div class="terminal__screen" data-terminal-screen aria-live="polite"></div>
+        <div class="visually-hidden" data-terminal-live aria-live="polite"></div>
+        <form class="terminal__form" data-terminal-form>
+          <label class="terminal__prompt" for="terminal-input">devarsh@workbench:~$</label>
+          <input
+            id="terminal-input"
+            class="terminal__input"
+            type="text"
+            data-terminal-input
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Terminal command"
+          >
+        </form>
+      </div>
+    </div>
 
     <footer class="site-footer">
       <div class="container">
@@ -649,6 +775,6 @@
     </footer>
   </div>
 
-  <script type="module" src="/js/main.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
